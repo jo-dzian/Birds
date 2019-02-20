@@ -1,3 +1,5 @@
+setwd ("D:/Ptaki_hydrologia/Obliczenia/R")
+
 #little tern #rybitwa białoczelna #(Sternula albifrons)
 
 tern <- data.frame( read.csv("Rybitwa.csv"))
@@ -9,3 +11,5 @@ b_gull <- data.frame( read.csv("Smieszka.csv"))
 #common gull #mewa siwa #(Larus canus)
 
 c_gull <- data.frame( read.csv("Mewa_siwa.csv"))
+
+
