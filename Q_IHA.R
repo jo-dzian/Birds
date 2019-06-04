@@ -25,3 +25,24 @@ Island_reach <- data.frame( read.csv("reaches_island.csv"))
 
 #zawezam dane do interesujacych mnie reachow
 Q2 <- Q1 %>% select(Date, matches("1036|1038|1077|1139|1213|1258|1302|1363|1387|1411|1451|1480|1580|1654|1697|1716|1725|1751|1779|1858|1910|1931|2054"))
+
+#######Testing IHA software##########
+Q3 <- Q1 %>% select(Date, matches("1363")) #%>% subset(Q3>="2004-1-1" & Q3 < "2005-1-1")
+
+cut.Date (Q3, min(2004)+1)
+
+write.table(Q3, file = "r_1363.txt", row.names = FALSE, sep=",")
+
+#######Testing hydrostats package##########
+
+install.packages("hydrostats")
+library(hydrostats)
+
+
+
+
+
+
+
+
+

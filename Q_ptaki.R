@@ -1,4 +1,4 @@
-setwd ("D:/Ptaki_hydrologia/Obliczenia/R")
+setwd ("D:/Ptaki_hydro/Obliczenia/R")
 
 #little tern #rybitwa białoczelna #(Sternula albifrons)
 
