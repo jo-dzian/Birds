@@ -4,9 +4,15 @@ install.packages("RColorBrewer")
 install.packages("lubridate")
 install.packages("tidyverse")
 install.packages("IHA", repos="http://R-Forge.R-project.org")
+install.packages("packrat")
+install.packages("tibble")
 
 library(tidyverse)
 library(dplyr)
+#packrat - package that manages all the differences between versions of packages and R
+library("packrat")
+library("tibble")
+library("EflowStats")
 
 setwd ("D:/Ptaki_hydro/Obliczenia/R/Birds")
 
@@ -26,22 +32,15 @@ Island_reach <- data.frame( read.csv("reaches_island.csv"))
 #zawezam dane do interesujacych mnie reachow (przyjmując, że to subbasiny)
 Q2 <- Q1 %>% select(c(1), as.vector(Island_reach$Subbasin)+1)
 
-#######Testing IHA software##########
-Q3 <- Q1 %>% select(Date, matches("1363")) #%>% subset(Q3>="2004-1-1" & Q3 < "2005-1-1")
+#Moving the date in the 1 collumn to become row names
+# Q2 %>% remove_rownames %>% column_to_rownames(var="Date")
 
-cut.Date (Q3, min(2004)+1)
 
-write.table(Q3, file = "r_1363.txt", row.names = FALSE, sep=",")
-
-#######Testing hydrostats package##########
-
-install.packages("hydrostats")
-library(hydrostats)
-
+#hydrostats package - other option
 #######Testing Eflowstats package##########
 
-install.packages("packrat")
-library("packrat")
+#preparation/instalation
+install.packages("EflowStats")
 
 rprofile_path = file.path(Sys.getenv("HOME"), ".Rprofile")
 write('\noptions(repos=c(getOption(\'repos\'),
@@ -53,13 +52,11 @@ write('\noptions(repos=c(getOption(\'repos\'),
 cat('Your Rprofile has been updated to include GRAN.
     Please restart R for changes to take effect.')
 
-install.packages("EflowStats")
-library("EflowStats")
+#calculations
 
-calc1 <- calc_durationHigh(Q3, yearType = "calendar", digits = 3, pref = "mean",
-                  floodThreshold = NULL)
+calc1 <- calc_durationHigh(Q2, yearType = "calendar", digits = 3, pref = "mean", floodThreshold = NULL)
 
-
+calc2 <- calc_timingHigh(Q2, yearType = "calendar", digits = 3, pref = "mean",floodThreshold = NULL)
 
 
 
