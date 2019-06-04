@@ -23,8 +23,8 @@ Q1 <- subset(Q, Q$Date >= "2004-1-1")
 #reach_wyspy - ta warstwa zawiera dane o subbasinach i outletach na których będę pracować (nie pracuje na 2160 subb tylko na ok. 44)
 Island_reach <- data.frame( read.csv("reaches_island.csv"))
 
-#zawezam dane do interesujacych mnie reachow
-Q2 <- Q1 %>% select(Date, matches("1036|1038|1077|1139|1213|1258|1302|1363|1387|1411|1451|1480|1580|1654|1697|1716|1725|1751|1779|1858|1910|1931|2054"))
+#zawezam dane do interesujacych mnie reachow (przyjmując, że to subbasiny)
+Q2 <- Q1 %>% select(c(1), as.vector(Island_reach$Subbasin)+1)
 
 #######Testing IHA software##########
 Q3 <- Q1 %>% select(Date, matches("1363")) #%>% subset(Q3>="2004-1-1" & Q3 < "2005-1-1")
@@ -38,8 +38,26 @@ write.table(Q3, file = "r_1363.txt", row.names = FALSE, sep=",")
 install.packages("hydrostats")
 library(hydrostats)
 
+#######Testing Eflowstats package##########
 
+install.packages("packrat")
+library("packrat")
 
+rprofile_path = file.path(Sys.getenv("HOME"), ".Rprofile")
+write('\noptions(repos=c(getOption(\'repos\'),
+      CRAN=\'https://cloud.r-project.org\',
+      USGS=\'https://owi.usgs.gov/R\'))\n',
+      rprofile_path, 
+      append =  TRUE)
+
+cat('Your Rprofile has been updated to include GRAN.
+    Please restart R for changes to take effect.')
+
+install.packages("EflowStats")
+library("EflowStats")
+
+calc1 <- calc_durationHigh(Q3, yearType = "calendar", digits = 3, pref = "mean",
+                  floodThreshold = NULL)
 
 
 
