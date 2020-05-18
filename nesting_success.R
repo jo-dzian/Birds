@@ -107,112 +107,15 @@ b_gull_point_sin_list <- lapply(b_gull.m.list, b_gull_point_sin)
 
 ############ individual box plot ################################
 
-b_gull_2004_box_sin <- b_gull.m %>%
-  filter(group == "2004") %>%
+b_gull_box_sin <- function (x) {
+  x %>%
   ggplot(aes (x=group, y=value))+
   geom_boxplot()+
   coord_cartesian( ylim = c(0, 2))+
   labs(x = "year", y="nesting success")
+}
 
-plot(b_gull_2004_box_sin)
-
-b_gull_2005_box_sin <- b_gull.m %>%
-  filter(group == "2005") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2006_box_sin <- b_gull.m %>%
-  filter(group == "2006") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2007_box_sin <- b_gull.m %>%
-  filter(group == "2007") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2008_box_sin <- b_gull.m %>%
-  filter(group == "2008") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2009_box_sin <- b_gull.m %>%
-  filter(group == "2009") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2010_box_sin <- b_gull.m %>%
-  filter(group == "2010") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2011_box_sin <- b_gull.m %>%
-  filter(group == "2011") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2012_box_sin <- b_gull.m %>%
-  filter(group == "2012") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2013_box_sin <- b_gull.m %>%
-  filter(group == "2013") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2014_box_sin <- b_gull.m %>%
-  filter(group == "2014") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2015_box_sin <- b_gull.m %>%
-  filter(group == "2015") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2016_box_sin <- b_gull.m %>%
-  filter(group == "2016") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2017_box_sin <- b_gull.m %>%
-  filter(group == "2017") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
-
-b_gull_2018_box_sin <- b_gull.m %>%
-  filter(group == "2018") %>%
-  ggplot(aes (x=group, y=value))+
-  geom_boxplot()+
-  coord_cartesian( ylim = c(0, 2))+
-  labs(x = "year", y="nesting success")
+b_gull_box_sin_list <- lapply(b_gull.m.list, b_gull_box_sin)
 
 
 
