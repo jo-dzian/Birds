@@ -209,7 +209,7 @@ Wwa = ggplot(Wwa_all, aes(x = date)) +
 
 print(Wwa)
 
-# ggof(sim, obs)
+# Goodness of Fit (sim, obs) hydrograph and values
 ggof(Wwa_all$FLOW_OUTcms, Wwa_all$Q, dates = Wwa_all$date)
 
 
@@ -230,7 +230,7 @@ Gusin = ggplot(Gusin_all, aes(x = date)) +
 
 print(Gusin)
 
-# ggof(sim, obs)
+# Goodness of Fit (sim, obs) hydrograph and values
 ggof(Gusin_all$FLOW_OUTcms, Gusin_all$Q, dates = Gusin_all$date)
 
 ####### Deblin station ###########
@@ -247,9 +247,7 @@ Deblin = ggplot(Deblin_all, aes(x = date)) +
   scale_x_date(date_breaks = "1 years") +
   scale_colour_manual(values=c("royalblue1","orangered2"))
 
-print(Deblin)
-
-# ggof(sim, obs)
+# Goodness of Fit (sim, obs) hydrograph and values
 ggof(Deblin_all$FLOW_OUTcms, Deblin_all$Q, dates = Deblin_all$date)
 
 ####### Pulawy station ###########
@@ -268,7 +266,7 @@ Pulawy = ggplot(Pulawy_all, aes(x = date)) +
 
 print(Pulawy)
 
-# ggof(sim, obs)
+# Goodness of Fit (sim, obs) hydrograph and values
 ggof(Pulawy_all$FLOW_OUTcms, Pulawy_all$Q, dates = Pulawy_all$date)
 
 ####### Annopol station ###########
@@ -287,7 +285,7 @@ Annopol = ggplot(Annopol_all, aes(x = date)) +
 
 print(Annopol)
 
-# ggof(sim, obs)
+# Goodness of Fit (sim, obs) hydrograph and values
 ggof(Annopol_all$FLOW_OUTcms, Annopol_all$Q, dates = Annopol_all$date)
 
 # daily and monthly results analysis

@@ -43,7 +43,7 @@ ggplot(tern.m, aes(group, value)) + geom_boxplot(fill="blue", alpha=0.5) +
   ggtitle("Little tern")+
   coord_cartesian( ylim = c(0, 2))
 #################################################################################################################
-######## FOR ALL 3 Birds
+######## Box Plot FOR ALL 3 Birds
 # create a list of your data.frames
 birds_list <- list(b_gull.m, c_gull.m, tern.m)
 # assign names to the dataframes in the list
@@ -52,6 +52,7 @@ names(birds_list) <- c("black headed gull","common gull", "little tern")
 # bind the dataframes together with rbindlist from data.table
 # the id parameter will create a variable with the names of the dataframes
 # you could also use 'bind_rows(l, .id="id")' from 'dplyr' for this
+library("data.table")
 birds_list2 <- rbindlist(birds_list, id="id")
 
 #? plot x axis labels between tick marks
@@ -85,9 +86,10 @@ ggplot(data=b_gull.m, aes(x=variable, y=value, colour = value >0))+
                       values = setNames(c('black','red'),c(T, F))) + 
   coord_cartesian( ylim = c(0, 2))
 
+# funcion to draw point graphs for each year
 b_gull_point_sin <- function(x) {
   ggplot(data=x, aes(x=variable, y=value, colour = value >0))+
-  facet_wrap(~group)+
+  facet_wrap(~group)+ # data is now in a list format according to year so this step seems unnecessary
   geom_point()+
   scale_colour_manual(name = 'Nesting succes > 0',
                       values = setNames(c('black','red'),c(T, F))) + 
@@ -97,188 +99,11 @@ b_gull_point_sin <- function(x) {
   labs(x = "island location (south<=>north)", y="nesting success")
 }
 
-plot_data_column = function (data, column) {
-  ggplot(data, aes_string(x = column)) +
-    geom_histogram(fill = "lightgreen") +
-    xlab(column)
-}
+#creating a list out of data on bird nesting success, split according to year
+b_gull.m.list <- split(b_gull.m, b_gull.m$group, drop = T)
 
-myplots <- lapply(colnames(data2), plot_data_column, data = data2)
-
-
-
-b_gull_point_sin_list <- lapply(b_gull.m, b_gull_point_sin)
+b_gull_point_sin_list <- lapply(b_gull.m.list, b_gull_point_sin)
   
-b_gull_point_sin_list <- b_gull_point_sin(b_gull.m)
-
-###### selected years
-#point graph
-b_gull_2004_point_sin <- b_gull.m %>%
-  filter(group == "2004") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2004")+
-  labs(x = "island location (south<=>north)", y="nesting success")
-
-plot(b_gull_2004_point_sin)
-
-b_gull_2005_point_sin <- b_gull.m %>%
-  filter(group == "2005") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 20045")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2006_point_sin <- b_gull.m %>%
-  filter(group == "2006") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2006")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2007_point_sin <- b_gull.m %>%
-  filter(group == "2007") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2007")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2008_point_sin <- b_gull.m %>%
-  filter(group == "2008") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2008")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2009_point_sin <- b_gull.m %>%
-  filter(group == "2009") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2009")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2010_point_sin <- b_gull.m %>%
-  filter(group == "2010") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2010")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2011_point_sin <- b_gull.m %>%
-  filter(group == "2011") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2011")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2012_point_sin <- b_gull.m %>%
-  filter(group == "2012") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2012")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2013_point_sin <- b_gull.m %>%
-  filter(group == "2013") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2013")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2014_point_sin <- b_gull.m %>%
-  filter(group == "2014") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2014")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2015_point_sin <- b_gull.m %>%
-  filter(group == "2015") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2015")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2016_point_sin <- b_gull.m %>%
-  filter(group == "2016") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2016")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2017_point_sin <- b_gull.m %>%
-  filter(group == "2017") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2017")+
-  labs(x = "island location (north<=>south)", y="nesting success")
-
-b_gull_2018_point_sin <- b_gull.m %>%
-  filter(group == "2018") %>%
-  ggplot(aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle("Black-headed gull 2018")+
-  labs(x = "island location (north<=>south)", y="nesting success")
 
 ############ individual box plot ################################
 
@@ -288,6 +113,8 @@ b_gull_2004_box_sin <- b_gull.m %>%
   geom_boxplot()+
   coord_cartesian( ylim = c(0, 2))+
   labs(x = "year", y="nesting success")
+
+plot(b_gull_2004_box_sin)
 
 b_gull_2005_box_sin <- b_gull.m %>%
   filter(group == "2005") %>%
