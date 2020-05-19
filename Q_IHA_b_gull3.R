@@ -51,14 +51,6 @@ b_gull <- data.frame( read.csv("D:/Ptaki_hydro/Obliczenia/R/Birds/b_gull_na.csv"
 # works with selecting 11 April every year
 #smieszka <- subset(Q_mod_Wisla, format.Date(Q_mod_Wisla$date, "%m")=="04" & format.Date(date, "%d")=="11")
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#GRAPH for vulnerability period
-#install.packages("patchwork") # To display 2 charts together
-#install.packages("hrbrthemes")
-#install.packages("scales")
-library(patchwork) 
 library(hrbrthemes)
 library(scales)
 
@@ -100,7 +92,7 @@ obs_vs_sim <- function(x, y) {
 #apply the function to two lists and produce .jpg plots into the folder
 obs_vs_sim_list <- mapply(obs_vs_sim, Smieszka_sub_list, Smieszka_obs_list, SIMPLIFY = FALSE)
 
-# COMAPRE BY LOCATION ######
+# COMPARE BY LOCATION ######
 ###### for Puławy
 
 Smieszka_mod_Pulawy_vp <- subset(Smieszka_Q, Smieszka_Q$RCH == "1545") # only for the vulnerability period
@@ -227,26 +219,24 @@ library("ggpubr")
 
 #ggarrange(plotlist = Smieszka_line_plot_list,nrow = 5,ncol = ceiling(length(Smieszka_line_plot_list)/2))
 
-plot_test1 <- ggarrange(plotlist = Smieszka_line_plot_list,nrow = 15,ncol = 1)
+Smieszka_line_plot_1 <- ggarrange(plotlist = Smieszka_line_plot_list,nrow = 15,ncol = 1)
 
-plot_test2 <- ggarrange(plotlist = b_gull_box_sin_list,nrow = 15, ncol = 1)
+b_gull_box_plot_2 <- ggarrange(plotlist = b_gull_box_sin_list,nrow = 15, ncol = 1)
 
 install.packages("patchwork")
 library("patchwork")
 
 #arrangement of plots with patchwork package
-b_gull_layout <- ((plot_test1  + plot_test2))+
+b_gull_layout <- ((Smieszka_line_plot_1  + b_gull_box_plot_2))+
                   B_gull_vp_plot +
                   plot_layout(width = c(1,0.5), height = c(3,0.3)) #width of 1st and 2nd column
                                                                     # hight of 1st row and 2nd row
 
+### ??? aline the dates in the vulnerability period graph and hydrogrpahs
+### ??? change the labels on the y axis to title of the columns
+
 print(b_gull_layout) 
 #save as width=700 and height=2000
-#ggsave(plot_test3, file = paste0("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/test/plot_test3.jpg", ".jpg"), #saving the plot into a folder
-#  device = "jpg",
-#   width = 8,
-#  height = 25)
-
 
 # other packages for arrangement of plots
 #install.packages("grid")
@@ -298,7 +288,7 @@ calc_IHA_sub <- function(x) {
     g4 <- group4(x1, year = c("calendar")) 
     g5 <- group5(x1, year = c("calendar")) 
     df <- cbind(g2, g3, g4, g5) 
-    out<- df[ -c(1,10,11,12)]
+    out<- df[ -c(1,10,11,12)]# columns which are not needed
     print(out)
            }
 
@@ -327,69 +317,69 @@ for (i in 1:length(RCH_split_bg)) {
 #cbind columns from Smieszka_IHA_sub_ and b_gull
 
 
-##### Calculate IHA in each subbasin/location
+##### Calculate IHA in each subbasin/island location pair
 
-#island 1/ sub 910
-  b_gull_1 <- cbind(b_gull[1], Smieszka_IHA_sub_910)
-#island 2/ sub 910
-  b_gull_2 <- cbind(b_gull[2], Smieszka_IHA_sub_910)
+#island 12/ sub 910
+  b_gull_22 <- cbind(b_gull[22], Smieszka_IHA_sub_910)
+#island 21/ sub 910
+  b_gull_21 <- cbind(b_gull[21], Smieszka_IHA_sub_910)
   
-#island 3/sub 950
-  b_gull_3 <- cbind(b_gull[3], Smieszka_IHA_sub_950)
-#island 4/sub 950
-  b_gull_4 <- cbind(b_gull[4], Smieszka_IHA_sub_950)
+#island 20/sub 950
+  b_gull_20 <- cbind(b_gull[20], Smieszka_IHA_sub_950)
+#island 19/sub 950
+  b_gull_19 <- cbind(b_gull[19], Smieszka_IHA_sub_950)
 
-#island 5/sub 1012
-  b_gull_5 <- cbind(b_gull[5], Smieszka_IHA_sub_1012)
+#island 18/sub 1012
+  b_gull_18 <- cbind(b_gull[18], Smieszka_IHA_sub_1012)
   
-#island 6/sub 1087
-  b_gull_6 <- cbind(b_gull[6], Smieszka_IHA_sub_1087)
+#island 17/sub 1087
+  b_gull_17 <- cbind(b_gull[17], Smieszka_IHA_sub_1087)
 
-#island 7/sub 1134
-  b_gull_7 <- cbind(b_gull[7], Smieszka_IHA_sub_1134)
-#island 8/sub 1134
-  b_gull_8 <- cbind(b_gull[8], Smieszka_IHA_sub_1134)
+#island 16/sub 1134
+  b_gull_16 <- cbind(b_gull[16], Smieszka_IHA_sub_1134)
+#island 15/sub 1134
+  b_gull_15 <- cbind(b_gull[15], Smieszka_IHA_sub_1134)
   
-#island 9/sub 1240
-  b_gull_9 <- cbind(b_gull[9], Smieszka_IHA_sub_1240)
-#island 10/sub 1240
-  b_gull_10 <- cbind(b_gull[10], Smieszka_IHA_sub_1240)
+#island 14/sub 1240
+  b_gull_14 <- cbind(b_gull[14], Smieszka_IHA_sub_1240)
+#island 13/sub 1240
+  b_gull_13 <- cbind(b_gull[13], Smieszka_IHA_sub_1240)
 
-#island 11/sub 1264
-  b_gull_11 <- cbind(b_gull[11], Smieszka_IHA_sub_1264)
+#island 12/sub 1264
+  b_gull_12 <- cbind(b_gull[12], Smieszka_IHA_sub_1264)
   
-#island 12/sub 1289
-  b_gull_12 <- cbind(b_gull[12], Smieszka_IHA_sub_1289)
+#island 11/sub 1289
+  b_gull_11 <- cbind(b_gull[11], Smieszka_IHA_sub_1289)
 
-#island 13/sub 1329
-  b_gull_13 <- cbind(b_gull[13], Smieszka_IHA_sub_1329)
+#island 10/sub 1329
+  b_gull_10 <- cbind(b_gull[10], Smieszka_IHA_sub_1329)
 
-#island 14/sub 1358
-  b_gull_14 <- cbind(b_gull[14], Smieszka_IHA_sub_1358)
+#island 9/sub 1358
+  b_gull_9 <- cbind(b_gull[9], Smieszka_IHA_sub_1358)
 
-#island 15/sub 1501
-  b_gull_15 <- cbind(b_gull[15], Smieszka_IHA_sub_1501)
+#island 8/sub 1501
+  b_gull_8 <- cbind(b_gull[8], Smieszka_IHA_sub_1501)
 
-#island 16/sub 1545
-  b_gull_16 <- cbind(b_gull[16], Smieszka_IHA_sub_1545)
+#island 7/sub 1545
+  b_gull_7 <- cbind(b_gull[7], Smieszka_IHA_sub_1545)
 
-#island 17/sub 1565
-  b_gull_17 <- cbind(b_gull[17], Smieszka_IHA_sub_1565)
+#island 6/sub 1565
+  b_gull_6 <- cbind(b_gull[6], Smieszka_IHA_sub_1565)
 
-#island 18/sub 1601
-  b_gull_18 <- cbind(b_gull[18], Smieszka_IHA_sub_1601)
+#island 5/sub 1601
+  b_gull_5 <- cbind(b_gull[5], Smieszka_IHA_sub_1601)
 
-#island 19/sub 1629
-  b_gull_19 <- cbind(b_gull[19], Smieszka_IHA_sub_1629)
+#island 4/sub 1629
+  b_gull_4 <- cbind(b_gull[4], Smieszka_IHA_sub_1629)
 
-#island 20/sub 1727
-  b_gull_20 <- cbind(b_gull[20], Smieszka_IHA_sub_1727)
+#island 3/sub 1727
+  b_gull_3 <- cbind(b_gull[3], Smieszka_IHA_sub_1727)
 
-#island 21/sub 1748
-  b_gull_21 <- cbind(b_gull[21], Smieszka_IHA_sub_1748)
+#island 2/sub 1748
+  b_gull_2 <- cbind(b_gull[2], Smieszka_IHA_sub_1748)
 
-#island 22/sub 1875
-  b_gull_22 <- cbind(b_gull[22], Smieszka_IHA_sub_1875)
+#island 1/sub 1875
+  b_gull_1 <- cbind(b_gull[1], Smieszka_IHA_sub_1875)
 
 ###########Checking correlation between IHA and nesting success
 #install.packages("corrplot")
@@ -402,6 +392,7 @@ b_gull_list <- list(b_gull_1,b_gull_2,b_gull_3, b_gull_4, b_gull_5, b_gull_6, b_
                     b_gull_9,b_gull_10,b_gull_11, b_gull_12, b_gull_13, b_gull_14, b_gull_15, b_gull_16,
                     b_gull_17,b_gull_18,b_gull_19, b_gull_20, b_gull_21, b_gull_22)
 
+
 #apply the correlation calculation function to all the elements of the list
 b_gull_matrix_list <- lapply(b_gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
 
@@ -411,11 +402,25 @@ b_gull_all <- do.call(rbind, lapply(b_gull_matrix_list, head, 1))
 #remove the 1st columns with 100% correlation
 b_gull_matrix <- b_gull_all[ ,-1]
 
-b_gull_mean <- as.data.frame(colMeans(b_gull_matrix, na.rm = TRUE)) 
-
 corrplot(b_gull_matrix, method = "number")
 
+############################ CURRENTY WORKING HERE 19th of May ##########################################
+######## ??? how to apply the function to a mean from the list
+# or draw regression plots between IHA values and Nesting success for all locations together on single plot
+
+plot_test1 <- (b_gull_1$X1 ~ b_gull_1$Max)
+plot(plot_test1)
+
+
+
+
 ### Summary
+b_gull_mean <- as.data.frame(colMeans(b_gull_matrix, na.rm = TRUE)) 
+
 bird_mean <- cbind(c_gull_mean,b_gull_mean)
 
 write.csv(bird_mean, "bird_mean.csv")
+
+
+
+
