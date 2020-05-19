@@ -107,6 +107,7 @@ b_gull_point_sin_list <- lapply(b_gull.m.list, b_gull_point_sin)
 
 ############ individual box plot ################################
 
+# function to draw box plots
 b_gull_box_sin <- function (x) {
   x %>%
   ggplot(aes (x=group, y=value))+
@@ -115,6 +116,7 @@ b_gull_box_sin <- function (x) {
   labs(x = "year", y="nesting success")
 }
 
+#apply the function to a list withindividual years
 b_gull_box_sin_list <- lapply(b_gull.m.list, b_gull_box_sin)
 
 

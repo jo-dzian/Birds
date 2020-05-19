@@ -64,6 +64,7 @@ library(scales)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ############################ graph for comparing simulated and observed streamflow in each year
+############################ during vulnerability period
 
 # COMAPRE BY YEAR ######
 # narrow down the subbasins to 5 that also have a gauging station
@@ -170,8 +171,9 @@ print(graph_Smieszka_2010)
 Smieszka_line_plot <- function (x) {
   ggplot(x, aes(date, FLOW_OUTcms, group = RCH)) +
     geom_line()+ 
-    labs(x = "2004", y="modelled Q m3/s")+
-    coord_cartesian( ylim = c(0, 3500))
+    facet_wrap( ~ format(date, "%Y"), scales = "free_x", ncol=1)+
+    labs(y="modelled Q m3/s")+
+    coord_cartesian( ylim = c(0, 4000))
   }
 
 print(Smieszka_line_plot(Smieszka2004))
@@ -219,117 +221,38 @@ print(B_gull_vp_plot)
 ################# COMBINING GRAPHS ON SINGLE PAGE
 
 
+install.packages("ggpubr")
+library("ggpubr")
+
+
+#ggarrange(plotlist = Smieszka_line_plot_list,nrow = 5,ncol = ceiling(length(Smieszka_line_plot_list)/2))
+
+plot_test1 <- ggarrange(plotlist = Smieszka_line_plot_list,nrow = 15,ncol = 1)
+
+plot_test2 <- ggarrange(plotlist = b_gull_box_sin_list,nrow = 15, ncol = 1)
+
 install.packages("patchwork")
 library("patchwork")
 
-#2004
-b_gull_2004_layout <- ((b_gull_2004_point_sin  + b_gull_2004_box_sin)+
- plot_layout(widths = c(6, 2)))/b_gull_Q_2004/B_gull_vp_plot
+#arrangement of plots with patchwork package
+b_gull_layout <- ((plot_test1  + plot_test2))+
+                  B_gull_vp_plot +
+                  plot_layout(width = c(1,0.5), height = c(3,0.3)) #width of 1st and 2nd column
+                                                                    # hight of 1st row and 2nd row
 
-print(b_gull_2004_layout)
+print(b_gull_layout) 
+#save as width=700 and height=2000
+#ggsave(plot_test3, file = paste0("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/test/plot_test3.jpg", ".jpg"), #saving the plot into a folder
+#  device = "jpg",
+#   width = 8,
+#  height = 25)
 
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2004_layout.jpg",
-       plot = b_gull_2004_layout, width = 15, height = 15)
 
-
-
-#2005
-b_gull_2005_layout <- ((b_gull_2005_point_sin  + b_gull_2005_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2005/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2005_layout.jpg",
-       plot = b_gull_2005_layout, width = 15, height = 15)
-
-#2006
-b_gull_2006_layout <- ((b_gull_2006_point_sin  + b_gull_2006_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2006/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2006_layout.jpg",
-       plot = b_gull_2006_layout, width = 15, height = 15)
-
-#2007
-b_gull_2007_layout <- ((b_gull_2007_point_sin  + b_gull_2007_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2007/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2007_layout.jpg",
-       plot = b_gull_2007_layout, width = 15, height = 15)
-
-#2008
-b_gull_2008_layout <- ((b_gull_2008_point_sin  + b_gull_2008_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2008/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2008_layout.jpg",
-       plot = b_gull_2008_layout, width = 15, height = 15)
-
-#2009
-b_gull_2009_layout <- ((b_gull_2009_point_sin  + b_gull_2009_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2009/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2009_layout.jpg",
-       plot = b_gull_2009_layout, width = 15, height = 15)
-
-#2010
-b_gull_2010_layout <- ((b_gull_2010_point_sin  + b_gull_2010_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2010/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2010_layout.jpg",
-       plot = b_gull_2010_layout, width = 15, height = 15)
-
-#2011
-b_gull_2011_layout <- ((b_gull_2011_point_sin  + b_gull_2011_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2011/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2011_layout.jpg",
-       plot = b_gull_2011_layout, width = 15, height = 15)
-
-#2012
-b_gull_2012_layout <- ((b_gull_2012_point_sin  + b_gull_2012_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2012/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2012_layout.jpg",
-       plot = b_gull_2012_layout, width = 15, height = 15)
-
-#2013
-b_gull_2013_layout <- ((b_gull_2013_point_sin  + b_gull_2013_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2013/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2013_layout.jpg",
-       plot = b_gull_2013_layout, width = 15, height = 15)
-
-#2014
-b_gull_2014_layout <- ((b_gull_2014_point_sin  + b_gull_2014_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2014/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2014_layout.jpg",
-       plot = b_gull_2014_layout, width = 15, height = 15)
-
-#2015
-b_gull_2015_layout <- ((b_gull_2015_point_sin  + b_gull_2015_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2015/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2015_layout.jpg",
-       plot = b_gull_2015_layout, width = 15, height = 15)
-
-#2016
-b_gull_2016_layout <- ((b_gull_2016_point_sin  + b_gull_2016_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2016/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2016_layout.jpg",
-       plot = b_gull_2016_layout, width = 15, height = 15)
-
-#2017
-b_gull_2017_layout <- ((b_gull_2017_point_sin  + b_gull_2017_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2017/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2017_layout.jpg",
-       plot = b_gull_2017_layout, width = 15, height = 15)
-
-#2018
-b_gull_2018_layout <- ((b_gull_2018_point_sin  + b_gull_2018_box_sin)+
-                         plot_layout(widths = c(6, 2)))/b_gull_Q_2018/B_gull_vp_plot
-
-ggsave("D:/Ptaki_hydro/Obliczenia/R/Graphs_out/layout_Q_NS/b_gull_2018_layout.jpg",
-       plot = b_gull_2018_layout, width = 15, height = 15)
+# other packages for arrangement of plots
+#install.packages("grid")
+#library("grid")
+#install.packages("gridExtra")
+#library("gridExtra")
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  IHA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
