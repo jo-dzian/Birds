@@ -258,7 +258,27 @@ library("xts")
 
 #install.packages("caTools")
 #install.packages("IHA", repos="http://R-Forge.R-project.org")
+#library("IHA")
+
+install.packages("Rcpp")
+library("Rcpp")
+
+devtools::install_github("jasonelaw/iha", force = TRUE)
+
+# When asked
+# These packages have more recent versions available.
+# It is recommended to update all of them.
+# Which would you like to update?
+  
+#1: All                        
+#2: CRAN packages only         
+#3: None                       
+#4: zoo (1.8-7 -> 1.8-8) [CRAN]
+
+# I've picked 3
+
 library("IHA")
+
 
 ################ Create data frames for each subbasin
 RCH_split_bg <- split(Smieszka_Q, Smieszka_Q$RCH)
@@ -393,25 +413,84 @@ b_gull_list <- list(b_gull_1,b_gull_2,b_gull_3, b_gull_4, b_gull_5, b_gull_6, b_
                     b_gull_17,b_gull_18,b_gull_19, b_gull_20, b_gull_21, b_gull_22)
 
 
-#apply the correlation calculation function to all the elements of the list
+#apply the correlation calculation function to ALL the elements of the list
 b_gull_matrix_list <- lapply(b_gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
 
-#extract the first row of the correlation matrix for each list
+#extract the first row of the correlation matrix from each list (correlation between NS and IHA values in a location)
 b_gull_all <- do.call(rbind, lapply(b_gull_matrix_list, head, 1))
 
-#remove the 1st columns with 100% correlation
+#remove the 1st columns with 100% correlation (correlation between NS and NS)
 b_gull_matrix <- b_gull_all[ ,-1]
 
 corrplot(b_gull_matrix, method = "number")
 
-############################ CURRENTY WORKING HERE 19th of May ##########################################
+############################ CURRENTY WORKING HERE 20th of May ##########################################
 ######## ??? how to apply the function to a mean from the list
 # or draw regression plots between IHA values and Nesting success for all locations together on single plot
 
-plot_test1 <- (b_gull_1$X1 ~ b_gull_1$Max)
-plot(plot_test1)
+# use only b_gull_list
 
+# We plot the independent variable on the x axis and the dependent variable on the y axis.
+# Regression analysis also gives us a value called R^2, R squared. This tells us how much of the variation 
+# in the y axis variable's values is accounted for by the variation in the x axis variable's values.
 
+#### ???? I'm not sure if I asigned x and y correctly
+
+# IHA 1
+list_day_1_min_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1:2))#select 1st and 2nd collumn
+                   
+colnames1 <- c("NS", "day_1_min")#set names in the collumn              
+                   
+list_day_1_min_indv_b_gull <- lapply(list_day_1_min_indv_b_gull, setNames, colnames1)# change collumn names                   
+
+list_day_1_min_b_gull <- do.call("rbind", list_day_1_min_indv_b_gull) # merge the 22 lists for individual locations into 1
+
+day_1_min_plot_b_gull <- ggscatter(list_day_1_min_b_gull, x = "NS", y = "day_1_min", add = "reg.line", conf.int = TRUE,
+          add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
+
+plot(day_1_min_plot_b_gull)
+
+# IHA 2
+list_day_1_max_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,3))#select 1st and 3nd collumn
+
+colnames2 <- c("NS", "day_1_max")#set names in the collumn              
+
+list_day_1_max_indv_b_gull <- lapply(list_day_1_max_indv_b_gull, setNames, colnames2)# change collumn names                   
+
+list_day_1_max_b_gull <- do.call("rbind", list_day_1_max_indv_b_gull) # merge the 22 lists for individual locations into 1
+
+day_1_max_plot_b_gull <- ggscatter(list_day_1_max_b_gull, x = "NS", y = "day_1_max", add = "reg.line", conf.int = TRUE,
+                                         add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
+
+plot(day_1_max_plot_b_gull)
+
+# IHA 15 High pulse lenght
+list_hp_length_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,15))#select 1st and 15th collumn
+
+colnames15 <- c("NS", "hp_length")#set names in the collumn              
+
+list_hp_length_indv_b_gull <- lapply(list_hp_length_indv_b_gull, setNames, colnames15)# change collumn names                   
+
+list_hp_length_b_gull <- do.call("rbind", list_hp_length_indv_b_gull) # merge the 22 lists for individual locations into 1
+
+hp_length_plot_b_gull <- ggscatter(list_hp_length_b_gull, x = "NS", y = "hp_length", add = "reg.line", conf.int = TRUE,
+                                   add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
+
+plot(hp_length_plot_b_gull)
+
+# IHA 16 Rise rate
+list_rise_rate_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,16))#select 1st and 16th collumn
+
+colnames16 <- c("NS", "Rise_rate")#set names in the collumn              
+
+list_rise_rate_indv_b_gull <- lapply(list_rise_rate_indv_b_gull, setNames, colnames16)# change collumn names                   
+
+list_rise_rate_b_gull <- do.call("rbind", list_rise_rate_indv_b_gull) # merge the 22 lists for individual locations into 1
+
+rise_rate_plot_b_gull <- ggscatter(list_rise_rate_b_gull, x = "NS", y = "Rise_rate", add = "reg.line", conf.int = TRUE,
+                                   add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
+
+plot(rise_rate_plot_b_gull)
 
 
 ### Summary
