@@ -279,6 +279,56 @@ devtools::install_github("jasonelaw/iha", force = TRUE)
 
 library("IHA")
 
+####### Altering IHA functions
+
+####### IHA group 1 Mean or median value for each calendar month replace with 
+# laying eggs 11.04 - 20.05
+# incubating 20.04 - 31.05
+# rearing chicks 1.05 - 10.06
+
+
+####### IHA group2 with a user definied period
+
+library(plyr)
+library(lubridate)
+data(bullrun)
+
+group2WithPeriod <- function (x, period, year = c("water", "calendar"), mimic.tnc = T, ...) {
+  stopifnot(is.zoo(x), inherits(index(x), "Date") | inherits(index(x), 
+                                                             "POSIXt"))
+  year <- match.arg(year)
+  yr <- switch(year, water = IHA::water.year(index(x)), calendar = year(index(x)))
+  rollx <- IHA::runmean.iha(x, year = yr, mimic.tnc = mimic.tnc)
+  xd <- cbind(year = yr, period = period, as.data.frame(rollx))
+  res <- ddply(xd, .(year, period), function(x) IHA::group2Funs(x[, -(1:2)]), ...)
+  return(res)
+} 
+
+group2WithPeriod(bullrun, quarters(index(bullrun))) # eg. second quarter (i.e. Q2) of the year
+
+
+# You can create an appropriate vector for the period argument using something like:
+
+Smieszka_sub_1545
+for (i in 1:length(RCH_split_bg)) {
+  assign(Smieszka_new_sub_names[i], RCH_split_bg[[i]]%>%       
+           dplyr::select(FLOW_OUTcms, date))
+}
+
+Smieszka_sub_1545$date2 <- as.POSIXct(Smieszka_sub_1545$date, format= ("%Y-%m-%d"), tz="GMT" )# doesn't have time
+
+Smieszka_sub_1545 <- select(Smieszka_sub_1545, c(1,3))
+
+little.gull <- as.interval(ddays(60), start = ISOdate(2004:2018, 5, 11)) # has time
+is.breeding <- index(Smieszka_sub_1545$date2) %within% as.list(little.gull)   # not woring
+
+little.gull <- as.interval(ddays(60), start = as.POSIXct(2004:2018, 5, 11)) # has time
+v <- format(as.POSIXct(v,format='%m/%d/%Y %H:%M:%S'),format='%m/%d/%Y')
+
+
+# Just watch your timezones!
+
+
 
 ################ Create data frames for each subbasin
 RCH_split_bg <- split(Smieszka_Q, Smieszka_Q$RCH)
@@ -337,7 +387,7 @@ for (i in 1:length(RCH_split_bg)) {
 #cbind columns from Smieszka_IHA_sub_ and b_gull
 
 
-##### Calculate IHA in each subbasin/island location pair
+##### join each subbasin/island location nesting success with IHA metrics
 
 #island 12/ sub 910
   b_gull_22 <- cbind(b_gull[22], Smieszka_IHA_sub_910)
@@ -425,8 +475,7 @@ b_gull_matrix <- b_gull_all[ ,-1]
 corrplot(b_gull_matrix, method = "number")
 
 ############################ CURRENTY WORKING HERE 20th of May ##########################################
-######## ??? how to apply the function to a mean from the list
-# or draw regression plots between IHA values and Nesting success for all locations together on single plot
+######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
 
 # use only b_gull_list
 
@@ -477,6 +526,8 @@ hp_length_plot_b_gull <- ggscatter(list_hp_length_b_gull, x = "NS", y = "hp_leng
                                    add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
 
 plot(hp_length_plot_b_gull)
+matrix_hp_length_b_gull <- cor(list_hp_length_b_gull,  use = "pairwise.complete.obs", method = c("pearson"))
+
 
 # IHA 16 Rise rate
 list_rise_rate_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,16))#select 1st and 16th collumn
@@ -491,6 +542,33 @@ rise_rate_plot_b_gull <- ggscatter(list_rise_rate_b_gull, x = "NS", y = "Rise_ra
                                    add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
 
 plot(rise_rate_plot_b_gull)
+
+# calculate the correlation
+matrix_rise_rate_b_gull <- as.data.frame(cor(list_rise_rate_b_gull,  use = "pairwise.complete.obs", method = c("pearson")))
+
+# drop the 1st column and 2nd row
+matrix_rise_rate_b_gull1 <- as.data.frame (matrix_rise_rate_b_gull[2,1])
+
+
+
+#### LIST
+
+cor_iha_b_gull_list <- list(
+  list_day_1_min_b_gull, # 1
+  list_day_1_max_b_gull, # 2
+  list_hp_length_b_gull, # 15
+  list_rise_rate_b_gull) # 16
+
+
+cor_iha_b_gull_matrix <- lapply(cor_iha_b_gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
+
+#extract the first row of the correlation matrix from each list (correlation between NS and IHA values in a location)
+cor_iha_b_gull_matrix_all <- do.call(rbind, lapply(cor_iha_b_gull_matrix, head, 2))
+
+#remove the 1st columns with 100% correlation (correlation between NS and NS)
+#cor_iha_b_gull <- cor_iha_b_gull_matrix_all[ ,-1]
+
+plot_test <- corrplot(cor_iha_b_gull_matrix_all, method = "number")
 
 
 ### Summary
