@@ -14,28 +14,28 @@ n_fun <- function(x){
 }
 
 ####### FOR Black headed gull #### Individual
-b_gull$group <- row.names(b_gull)
-b_gull.m <- melt(b_gull, id.vars = "group") # data on nesting success melted into a single dataframe with all locations
+bh_gull_NS$group <- row.names(bh_gull_NS)
+bh_gull.m <- melt(bh_gull_NS, id.vars = "group") # data on nesting success melted into a single dataframe with all locations
 
-ggplot(b_gull.m, aes(group, value)) + geom_boxplot(fill="orange", alpha=0.5) + 
+ggplot(bh_gull.m, aes(group, value)) + geom_boxplot(fill="orange", alpha=0.5) + 
   stat_summary( fun.data = n_fun, geom = "text",  fun = median)+ #add count = number of observations
   labs(x = "year", y="nesting success") +
   ggtitle("Black headed gull")+
   coord_cartesian( ylim = c(0, 2))
 
-####### FOR common gull #### Individual
-c_gull$group <- row.names(c_gull)
-c_gull.m <- melt(c_gull, id.vars = "group")
+####### FOR mew gull #### Individual
+m_gull_NS$group <- row.names(m_gull_NS)
+m_gull.m <- melt(m_gull_NS, id.vars = "group")
 
-ggplot(c_gull.m, aes(group, value)) + geom_boxplot(fill="green", alpha=0.5) + 
+ggplot(m_gull.m, aes(group, value)) + geom_boxplot(fill="green", alpha=0.5) + 
   stat_summary( fun.data = n_fun, geom = "text",  fun = median)+ #add count = number of observations
   labs(x = "year", y="nesting success") +
-  ggtitle("Common gull")+
+  ggtitle("Mew gull")+
   coord_cartesian( ylim = c(0, 2))
 
 ####### FOR Little tern #### Individual
-tern$group <- row.names(tern)
-tern.m <- melt(tern, id.vars = "group")
+tern_NS$group <- row.names(tern_NS)
+tern.m <- melt(tern_NS, id.vars = "group")
 
 ggplot(tern.m, aes(group, value)) + geom_boxplot(fill="blue", alpha=0.5) + 
   stat_summary( fun.data = n_fun, geom = "text",  fun.y = median)+ #add count = number of observations
@@ -45,9 +45,9 @@ ggplot(tern.m, aes(group, value)) + geom_boxplot(fill="blue", alpha=0.5) +
 #################################################################################################################
 ######## Box Plot FOR ALL 3 Birds
 # create a list of your data.frames
-birds_list <- list(b_gull.m, c_gull.m, tern.m)
+birds_list <- list(bh_gull.m, m_gull.m, tern.m)
 # assign names to the dataframes in the list
-names(birds_list) <- c("black headed gull","common gull", "little tern")
+names(birds_list) <- c("black headed gull","mew gull", "little tern")
 
 # bind the dataframes together with rbindlist from data.table
 # the id parameter will create a variable with the names of the dataframes
@@ -75,36 +75,7 @@ ggplot(birds_list2, aes(x=group, y=value, fill=id)) +
   scale_fill_brewer(palette = "Dark2")+
   theme(axis.ticks.x = element_blank())
 
-#################################################################################################################
-########################### POINT PLOT NESTING SUCCESS ################################
-
-### All years
-ggplot(data=b_gull.m, aes(x=variable, y=value, colour = value >0))+
-  geom_point()+
-  facet_wrap(~group, ncol=3, nrow=5)+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))
-
-# funcion to draw point graphs for each year
-b_gull_point_sin <- function(x) {
-  ggplot(data=x, aes(x=variable, y=value, colour = value >0))+
-  facet_wrap(~group)+ # data is now in a list format according to year so this step seems unnecessary
-  geom_point()+
-  scale_colour_manual(name = 'Nesting succes > 0',
-                      values = setNames(c('black','red'),c(T, F))) + 
-  coord_cartesian( ylim = c(0, 2))+
-  theme(legend.text=element_text(size=6))+
-  ggtitle(x$group, subtitle ="Black-headed gull") +
-  labs(x = "island location (south<=>north)", y="nesting success")
-}
-
-#creating a list out of data on bird nesting success, split according to year
-b_gull.m.list <- split(b_gull.m, b_gull.m$group, drop = T)
-
-b_gull_point_sin_list <- lapply(b_gull.m.list, b_gull_point_sin)
-  
-
+#????????? TRASH????###################################################################################
 ############ individual box plot ################################
 
 # function to draw box plots

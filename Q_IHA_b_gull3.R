@@ -69,7 +69,7 @@ extract_gauge <- function (x) {
 }
 
 #apply the function to a list
-Smieszka_sub_list <- lapply(Smieszka_list, extract_gauge)
+Smieszka_sub_list <- lapply(bh.gull_Q_mod_list , extract_gauge)
 
 #a function to create and save a plot
 obs_vs_sim <- function(x, y) {  
@@ -171,7 +171,7 @@ Smieszka_line_plot <- function (x) {
 print(Smieszka_line_plot(Smieszka2004))
 ## apply it to a list
 
-Smieszka_line_plot_list <- lapply(Smieszka_list, Smieszka_line_plot)
+Smieszka_line_plot_list <- lapply(bh.gull_Q_mod_list , Smieszka_line_plot)
 
 ########### GHANT CHART VULNERABILITY PERIOD
 
@@ -283,7 +283,10 @@ library("IHA")
 
 ####### IHA group 1 Mean or median value for each calendar month replace with 
 # laying eggs 11.04 - 20.05
+
 # incubating 20.04 - 31.05
+
+
 # rearing chicks 1.05 - 10.06
 
 
