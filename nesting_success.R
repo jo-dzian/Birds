@@ -115,7 +115,6 @@ b_gull_box_sin <- function (x) {
   coord_cartesian( ylim = c(0, 2))+
   labs(x = "year", y="nesting success")
 }
-
 #apply the function to a list withindividual years
 b_gull_box_sin_list <- lapply(b_gull.m.list, b_gull_box_sin)
 

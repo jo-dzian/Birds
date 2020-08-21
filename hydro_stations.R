@@ -12,7 +12,7 @@ setwd("D:/Ptaki_hydro/Obliczenia/R/Kalibracja_Q_PL")
 observed_Q <- read.csv("codz.csv", header = FALSE)
 print(max(observed_Q$V4))
 
-#remove rows with no measurments before 1971 and with no data (999999.999)  
+#remove rows with no measurments before 2004 and with no data (999999.999)  
 remove_date <- observed_Q[!(observed_Q$V4<2004 | observed_Q$V8==99999.999),] 
 
 #removing column which are not needed (data on month of hydrological year, water level and temperature)

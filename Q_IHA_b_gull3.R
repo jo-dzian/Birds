@@ -213,7 +213,7 @@ print(B_gull_vp_plot)
 ################# COMBINING GRAPHS ON SINGLE PAGE
 
 
-install.packages("ggpubr")
+#install.packages("ggpubr")
 library("ggpubr")
 
 
@@ -223,7 +223,7 @@ Smieszka_line_plot_1 <- ggarrange(plotlist = Smieszka_line_plot_list,nrow = 15,n
 
 b_gull_box_plot_2 <- ggarrange(plotlist = b_gull_box_sin_list,nrow = 15, ncol = 1)
 
-install.packages("patchwork")
+#install.packages("patchwork")
 library("patchwork")
 
 #arrangement of plots with patchwork package
@@ -260,7 +260,7 @@ library("xts")
 #install.packages("IHA", repos="http://R-Forge.R-project.org")
 #library("IHA")
 
-install.packages("Rcpp")
+#install.packages("Rcpp")
 library("Rcpp")
 
 devtools::install_github("jasonelaw/iha", force = TRUE)
