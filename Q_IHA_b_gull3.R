@@ -282,73 +282,21 @@ devtools::install_github("jasonelaw/iha", force = TRUE)
 
 library("IHA")
 
-####### Altering IHA functions
-
-####### IHA group 1 Mean or median value for each calendar month replace with 
-# laying eggs 11.04 - 20.05
-
-# incubating 20.04 - 31.05
-
-# rearing chicks 1.05 - 10.06
-
-
-####### IHA group2 with a user definied period
-
-library(plyr)
-library(lubridate)
-data(bullrun)
-
-group2WithPeriod <- function (x, period, year = c("water", "calendar"), mimic.tnc = T, ...) {
-  stopifnot(is.zoo(x), inherits(index(x), "Date") | inherits(index(x), 
-                                                             "POSIXt"))
-  year <- match.arg(year)
-  yr <- switch(year, water = IHA::water.year(index(x)), calendar = year(index(x)))
-  rollx <- IHA::runmean.iha(x, year = yr, mimic.tnc = mimic.tnc)
-  xd <- cbind(year = yr, period = period, as.data.frame(rollx))
-  res <- ddply(xd, .(year, period), function(x) IHA::group2Funs(x[, -(1:2)]), ...)
-  return(res)
-} 
-
-group2WithPeriod(bullrun, quarters(index(bullrun))) # eg. second quarter (i.e. Q2) of the year
-
-
-# You can create an appropriate vector for the period argument using something like:
-
-Smieszka_sub_1545
-for (i in 1:length(RCH_split_bg)) {
-  assign(Smieszka_new_sub_names[i], RCH_split_bg[[i]]%>%       
-           dplyr::select(FLOW_OUTcms, date))
-}
-
-Smieszka_sub_1545$date2 <- as.POSIXct(Smieszka_sub_1545$date, format= ("%Y-%m-%d"), tz="GMT" )# doesn't have time
-
-Smieszka_sub_1545 <- select(Smieszka_sub_1545, c(1,3))
-
-little.gull <- as.interval(ddays(60), start = ISOdate(2004:2018, 5, 11)) # has time
-is.breeding <- index(Smieszka_sub_1545$date2) %within% as.list(little.gull)   # not woring
-
-little.gull <- as.interval(ddays(60), start = as.POSIXct(2004:2018, 5, 11)) # has time
-v <- format(as.POSIXct(v,format='%m/%d/%Y %H:%M:%S'),format='%m/%d/%Y')
-
-
-# Just watch your timezones!
-
-
 
 ################ Create data frames for each subbasin
-RCH_split_bg <- split(Smieszka_Q, Smieszka_Q$RCH)
+RCH_split_bh.gull <- split(bh.gull_Q_mod, bh.gull_Q_mod$RCH)
 
 #################### CREATING STREAMFLOW AND DATE DATA FRAME PER SUBBASIN
 #seting the prefix that's going to appear in each new data frame name
-prefix1_bg <- "Smieszka_sub"
+prefix1_bh.gull <- "bh.gull_sub"
 #setting the structure of the data frame name
-Smieszka_new_sub_names <- paste(prefix1_bg,sep="_",(as.character(unique(Smieszka_Q$RCH))))
+bh.gull_new_sub_names <- paste(prefix1_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
 
 ### Loop for creating all data frames in single go
 ### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
 
-for (i in 1:length(RCH_split_bg)) {
-  assign(Smieszka_new_sub_names[i], RCH_split_bg[[i]]%>%       
+for (i in 1:length(RCH_split_bh.gull)) {
+  assign(bh.gull_new_sub_names[i], RCH_split_bh.gull[[i]]%>%       
            remove_rownames %>% 
            column_to_rownames(var="date")%>%
            dplyr::select(FLOW_OUTcms))
@@ -370,15 +318,15 @@ calc_IHA_sub <- function(x) {
 #################### CREATING YEAR AND IHA DATA FRAME PER SUBBASIN
 
 #seting the prefix that's going to appear in each new data frame name
-prefix2_bg <- "Smieszka_IHA_sub"
+prefix2_bh.gull <- "bh.gull_IHA_sub"
 #setting the structure of the data frame name
-Smieszka_IHA_sub_names <- paste(prefix2_bg,sep="_",(as.character(unique(Smieszka_Q$RCH))))
+bh.gull_IHA_sub_names <- paste(prefix2_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
 
 ### Loop for creating all data frames in single go
 ### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
 
-for (i in 1:length(RCH_split_bg)) {
-  assign(Smieszka_IHA_sub_names[i], RCH_split_bg[[i]]%>%       
+for (i in 1:length(RCH_split_bh.gull)) {
+  assign(bh.gull_IHA_sub_names[i], RCH_split_bh.gull[[i]]%>%       
            remove_rownames %>% 
            column_to_rownames(var="date")%>%
            dplyr::select(FLOW_OUTcms)%>%
@@ -395,66 +343,66 @@ for (i in 1:length(RCH_split_bg)) {
 ##### join each subbasin/island location nesting success with IHA metrics
 
 #island 12/ sub 910
-  b_gull_22 <- cbind(b_gull[22], Smieszka_IHA_sub_910)
+  bh.gull_22 <- cbind(bh_gull_NS[22], bh.gull_IHA_sub_910)
 #island 21/ sub 910
-  b_gull_21 <- cbind(b_gull[21], Smieszka_IHA_sub_910)
+  bh.gull_21 <- cbind(bh_gull_NS[21], bh.gull_IHA_sub_910)
   
 #island 20/sub 950
-  b_gull_20 <- cbind(b_gull[20], Smieszka_IHA_sub_950)
+  bh.gull_20 <- cbind(bh_gull_NS[20], bh.gull_IHA_sub_950)
 #island 19/sub 950
-  b_gull_19 <- cbind(b_gull[19], Smieszka_IHA_sub_950)
+  bh.gull_19 <- cbind(bh_gull_NS[19], bh.gull_IHA_sub_950)
 
 #island 18/sub 1012
-  b_gull_18 <- cbind(b_gull[18], Smieszka_IHA_sub_1012)
+  bh.gull_18 <- cbind(bh_gull_NS[18], bh.gull_IHA_sub_1012)
   
 #island 17/sub 1087
-  b_gull_17 <- cbind(b_gull[17], Smieszka_IHA_sub_1087)
+  bh.gull_17 <- cbind(bh_gull_NS[17], bh.gull_IHA_sub_1087)
 
 #island 16/sub 1134
-  b_gull_16 <- cbind(b_gull[16], Smieszka_IHA_sub_1134)
+  bh.gull_16 <- cbind(bh_gull_NS[16], bh.gull_IHA_sub_1134)
 #island 15/sub 1134
-  b_gull_15 <- cbind(b_gull[15], Smieszka_IHA_sub_1134)
+  bh.gull_15 <- cbind(bh_gull_NS[15], bh.gull_IHA_sub_1134)
   
 #island 14/sub 1240
-  b_gull_14 <- cbind(b_gull[14], Smieszka_IHA_sub_1240)
+  bh.gull_14 <- cbind(bh_gull_NS[14], bh.gull_IHA_sub_1240)
 #island 13/sub 1240
-  b_gull_13 <- cbind(b_gull[13], Smieszka_IHA_sub_1240)
+  bh.gull_13 <- cbind(bh_gull_NS[13], bh.gull_IHA_sub_1240)
 
 #island 12/sub 1264
-  b_gull_12 <- cbind(b_gull[12], Smieszka_IHA_sub_1264)
+  bh.gull_12 <- cbind(bh_gull_NS[12], bh.gull_IHA_sub_1264)
   
 #island 11/sub 1289
-  b_gull_11 <- cbind(b_gull[11], Smieszka_IHA_sub_1289)
+  bh.gull_11 <- cbind(bh_gull_NS[11], bh.gull_IHA_sub_1289)
 
 #island 10/sub 1329
-  b_gull_10 <- cbind(b_gull[10], Smieszka_IHA_sub_1329)
+  bh.gull_10 <- cbind(bh_gull_NS[10], bh.gull_IHA_sub_1329)
 
 #island 9/sub 1358
-  b_gull_9 <- cbind(b_gull[9], Smieszka_IHA_sub_1358)
+  bh.gull_9 <- cbind(bh_gull_NS[9], bh.gull_IHA_sub_1358)
 
 #island 8/sub 1501
-  b_gull_8 <- cbind(b_gull[8], Smieszka_IHA_sub_1501)
+  bh.gull_8 <- cbind(bh_gull_NS[8], bh.gull_IHA_sub_1501)
 
 #island 7/sub 1545
-  b_gull_7 <- cbind(b_gull[7], Smieszka_IHA_sub_1545)
+  bh.gull_7 <- cbind(bh_gull_NS[7], bh.gull_IHA_sub_1545)
 
 #island 6/sub 1565
-  b_gull_6 <- cbind(b_gull[6], Smieszka_IHA_sub_1565)
+  bh.gull_6 <- cbind(bh_gull_NS[6], bh.gull_IHA_sub_1565)
 
 #island 5/sub 1601
-  b_gull_5 <- cbind(b_gull[5], Smieszka_IHA_sub_1601)
+  bh.gull_5 <- cbind(bh_gull_NS[5], bh.gull_IHA_sub_1601)
 
 #island 4/sub 1629
-  b_gull_4 <- cbind(b_gull[4], Smieszka_IHA_sub_1629)
+  bh.gull_4 <- cbind(bh_gull_NS[4], bh.gull_IHA_sub_1629)
 
 #island 3/sub 1727
-  b_gull_3 <- cbind(b_gull[3], Smieszka_IHA_sub_1727)
+  bh.gull_3 <- cbind(bh_gull_NS[3], bh.gull_IHA_sub_1727)
 
 #island 2/sub 1748
-  b_gull_2 <- cbind(b_gull[2], Smieszka_IHA_sub_1748)
+  bh.gull_2 <- cbind(bh_gull_NS[2], bh.gull_IHA_sub_1748)
 
 #island 1/sub 1875
-  b_gull_1 <- cbind(b_gull[1], Smieszka_IHA_sub_1875)
+  bh.gull_1 <- cbind(bh_gull_NS[1], bh.gull_IHA_sub_1875)
 
 ###########Checking correlation between IHA and nesting success
 #install.packages("corrplot")
@@ -463,21 +411,23 @@ library("corrplot")
 
 ### Correlation for subbasin 
 #create a list
-b_gull_list <- list(b_gull_1,b_gull_2,b_gull_3, b_gull_4, b_gull_5, b_gull_6, b_gull_7, b_gull_8, 
-                    b_gull_9,b_gull_10,b_gull_11, b_gull_12, b_gull_13, b_gull_14, b_gull_15, b_gull_16,
-                    b_gull_17,b_gull_18,b_gull_19, b_gull_20, b_gull_21, b_gull_22)
+bh.gull_list <- list(bh.gull_1,bh.gull_2,bh.gull_3, bh.gull_4, bh.gull_5, bh.gull_6, bh.gull_7, bh.gull_8, 
+                    bh.gull_9,bh.gull_10,bh.gull_11, bh.gull_12, bh.gull_13, bh.gull_14, bh.gull_15, bh.gull_16,
+                    bh.gull_17,bh.gull_18,bh.gull_19, bh.gull_20, bh.gull_21, bh.gull_22)
 
 
 #apply the correlation calculation function to ALL the elements of the list
-b_gull_matrix_list <- lapply(b_gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
+bh.gull_matrix_list <- lapply(bh.gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
 
 #extract the first row of the correlation matrix from each list (correlation between NS and IHA values in a location)
-b_gull_all <- do.call(rbind, lapply(b_gull_matrix_list, head, 1))
+bh.gull_all <- do.call(rbind, lapply(bh.gull_matrix_list, head, 1))
 
 #remove the 1st columns with 100% correlation (correlation between NS and NS)
-b_gull_matrix <- b_gull_all[ ,-1]
+bh.gull_matrix <- bh.gull_all[ ,-1]
 
-corrplot(b_gull_matrix, method = "number")
+corrplot(bh.gull_matrix, method = "number")
+
+
 
 ############################ CURRENTY WORKING HERE 20th of May ##########################################
 ######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
@@ -583,6 +533,64 @@ bird_mean <- cbind(c_gull_mean,b_gull_mean)
 
 write.csv(bird_mean, "bird_mean.csv")
 
+
+####### Altering IHA functions ###############################################################33
+
+####### IHA group 1 Mean or median value for each calendar month replace with 
+# laying eggs 11.04 - 20.05
+
+bh.gull_interv_le1 <- as.interval(ddays(40), start = ISOdate(2004:2018, 4, 11, 0, tz = 'Europe/Warsaw'))
+bh.gull_interv_le2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_le1)
+bh.gull_interv_le3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_le2)]
+#Narrow down the Q data to vulnerability period
+bh.gull_interv_le <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_le3, ] 
+bh.gull_le_gr.1 <- mean()
+
+# incubating 20.04 - 31.05
+
+# rearing chicks 1.05 - 10.06
+
+
+####### IHA group2 with a user definied period
+
+library(plyr)
+library(lubridate)
+data(bullrun)
+
+group2WithPeriod <- function (x, period, year = c("water", "calendar"), mimic.tnc = T, ...) {
+  stopifnot(is.zoo(x), inherits(index(x), "Date") | inherits(index(x), 
+                                                             "POSIXt"))
+  year <- match.arg(year)
+  yr <- switch(year, water = IHA::water.year(index(x)), calendar = year(index(x)))
+  rollx <- IHA::runmean.iha(x, year = yr, mimic.tnc = mimic.tnc)
+  xd <- cbind(year = yr, period = period, as.data.frame(rollx))
+  res <- ddply(xd, .(year, period), function(x) IHA::group2Funs(x[, -(1:2)]), ...)
+  return(res)
+} 
+
+group2WithPeriod(bullrun, quarters(index(bullrun))) # eg. second quarter (i.e. Q2) of the year
+
+
+# You can create an appropriate vector for the period argument using something like:
+
+Smieszka_sub_1545
+for (i in 1:length(RCH_split_bg)) {
+  assign(Smieszka_new_sub_names[i], RCH_split_bg[[i]]%>%       
+           dplyr::select(FLOW_OUTcms, date))
+}
+
+Smieszka_sub_1545$date2 <- as.POSIXct(Smieszka_sub_1545$date, format= ("%Y-%m-%d"), tz="GMT" )# doesn't have time
+
+Smieszka_sub_1545 <- select(Smieszka_sub_1545, c(1,3))
+
+little.gull <- as.interval(ddays(60), start = ISOdate(2004:2018, 5, 11)) # has time
+is.breeding <- index(Smieszka_sub_1545$date2) %within% as.list(little.gull)   # not woring
+
+little.gull <- as.interval(ddays(60), start = as.POSIXct(2004:2018, 5, 11)) # has time
+v <- format(as.POSIXct(v,format='%m/%d/%Y %H:%M:%S'),format='%m/%d/%Y')
+
+
+# Just watch your timezones!
 
 
 
