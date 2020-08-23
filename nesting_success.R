@@ -1,4 +1,4 @@
-
+# SCRIPT NO. 3
 ######################################## NESTING SUCCESS ################################
 
 ######################################## BOX PLOT
@@ -79,15 +79,19 @@ ggplot(birds_list2, aes(x=group, y=value, fill=id)) +
 ############ individual box plot ################################
 
 # function to draw box plots
-b_gull_box_sin <- function (x) {
+bh.gull_box_sin <- function (x) {
   x %>%
   ggplot(aes (x=group, y=value))+
   geom_boxplot()+
   coord_cartesian( ylim = c(0, 2))+
   labs(x = "year", y="nesting success")
 }
+
+library("dplyr")
+bh.gull.m_list <- bh_gull.m %>% group_split(bh_gull.m$group)
+
 #apply the function to a list withindividual years
-b_gull_box_sin_list <- lapply(b_gull.m.list, b_gull_box_sin)
+bh.gull_box_sin_list <- lapply(bh.gull.m_list, bh.gull_box_sin)
 
 
 

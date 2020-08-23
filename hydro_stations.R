@@ -1,3 +1,4 @@
+# SCRIPT NO. 1
 # code that analyses observed data from gauging stations, creates basic hydrographs.
 # Loads SWAT output files with modelled streamflow.
 # compares modelled and observed data by calculating goodness of fit measures (GOF) 

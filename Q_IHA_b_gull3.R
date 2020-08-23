@@ -7,6 +7,7 @@ install.packages("IHA", repos="http://R-Forge.R-project.org")
 install.packages("packrat")
 install.packages("tibble")
 install.packages("ggplot2")
+install.packages("ggplot")
 install.packages("readr")
 install.packages("purrr")
 
@@ -22,7 +23,6 @@ library("ggplot2")
 library("lubridate")
 library("purrr")
 library("ggforce")
-library ("ggplot2")
 
 setwd ("D:/Ptaki_hydro/Obliczenia/R/IHA")
 
@@ -39,17 +39,11 @@ Q_mod_Wisla$date <- as.Date(Q_mod_Wisla$mdate, format="%Y-%m-%d")
 #yyyy-mm-dd
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#Data with vulnerability period for Śmieszka : 11.04 - 10.06
-
-Smieszka_Q <- read.csv("D:/Ptaki_hydro/Obliczenia/R/Birds/Smieszka_Q.csv")
+# Data with vulnerability period for Śmieszka : 11.04 - 10.06
+# bh.gull_Q_mod - data with modelled streamflow for vulnerability period for BHG
 
 #black-headed gull #Śmieszka #(Chroicocephalus ridibundus) nesting success data
-
-b_gull <- data.frame( read.csv("D:/Ptaki_hydro/Obliczenia/R/Birds/b_gull_na.csv")) %>%
-          remove_rownames %>% column_to_rownames(var="X")
-
-# works with selecting 11 April every year
-#smieszka <- subset(Q_mod_Wisla, format.Date(Q_mod_Wisla$date, "%m")=="04" & format.Date(date, "%d")=="11")
+# bh_gull_NS
 
 library(hrbrthemes)
 library(scales)
@@ -69,45 +63,46 @@ extract_gauge <- function (x) {
 }
 
 #apply the function to a list
-Smieszka_sub_list <- lapply(bh.gull_Q_mod_list , extract_gauge)
+bh.gull_sub_list <- lapply(bh.gull_Q_mod_list , extract_gauge)
 
 #a function to create and save a plot
 obs_vs_sim <- function(x, y) {  
   plot_type1 <- ggplot()+
     geom_line(data=x, aes(x=date, y=FLOW_OUTcms), color = "blue")+ #simulated
     geom_line(data=y, aes(x=date, y=Q), color="red")+ #observed
-    facet_wrap(~RCH2, ncol=1)+
+    facet_wrap(~RCH, ncol=1)+
     labs(x = "year", y="Streamflow") +
-    ggtitle(y$YEAR) + 
+    ggtitle(y$Year) + 
     scale_x_date(date_breaks = "10 days")+
     theme(plot.title = element_text(hjust = 0.5))+#positioning the title in the center
     coord_cartesian( ylim = c(0, 6000))
   print(plot_type1)
-  ggsave(plot_type1, file = paste0("Q_mod_obs/b_gull/", y$YEAR, ".jpg"), #saving the plot into a folder
+  ggsave(plot_type1, file = paste0("D:/Ptaki_hydro/Obliczenia/R/Kalibracja_Q_PL/Q_mod_obs/bh_gull/",
+                                   y$Year, ".jpg"), #saving the plot into a folder
          device = "jpg",
-         width = 10,
-         height = 15)
+         width = 11,
+         height = 16)
 }
 
 #apply the function to two lists and produce .jpg plots into the folder
-obs_vs_sim_list <- mapply(obs_vs_sim, Smieszka_sub_list, Smieszka_obs_list, SIMPLIFY = FALSE)
+obs_vs_sim_list <- mapply(obs_vs_sim, bh.gull_sub_list, bh.gull_Q_obs_list, SIMPLIFY = FALSE)
 
 # COMPARE BY LOCATION ######
 ###### for Puławy
 
-Smieszka_mod_Pulawy_vp <- subset(Smieszka_Q, Smieszka_Q$RCH == "1545") # only for the vulnerability period
-Smieszka_mod_Pulawy_vp$date = as.Date(Smieszka_mod_Pulawy_vp$date, format="%Y-%m-%d")
-Smieszka_mod_Pulawy_vp$YEAR <- format(as.Date(Smieszka_mod_Pulawy_vp$date, format="%Y-%m-%d"),"%Y")
+bh.gull_mod_Pulawy_vp <- subset(bh.gull_Q_mod, bh.gull_Q_mod$RCH == "1545") # only for the vulnerability period
+#bh.gull_mod_Pulawy_vp$date = as.Date(Smieszka_mod_Pulawy_vp$date, format="%Y-%m-%d")
+#bh.gull_mod_Pulawy_vp$YEAR <- format(as.Date(Smieszka_mod_Pulawy_vp$date, format="%Y-%m-%d"),"%Y")
 
-Smieszka_obs_Pulawy_vp <- subset(Smieszka_Q_obs, Smieszka_Q_obs$RCH =="1545")#checked subbasin with Puławy
+bh.gull_obs_Pulawy_vp <- subset(bh.gull_Q_obs, bh.gull_Q_obs$RCH =="1545")#checked subbasin with Puławy
 #to make sure months are displayed in English
 
 Sys.setlocale("LC_ALL", "English")
 Sys.setenv("LANGUAGE"="En")
 
-Smieszka_obs_vs_sim_location <- ggplot()+
-    geom_line(data=Smieszka_mod_Pulawy_vp, aes(x=date, y=FLOW_OUTcms), color = "blue")+ #simulated
-    geom_line(data=Smieszka_obs_Pulawy_vp, aes(x=date, y=Q), color="red")+ #observed
+bh.gull_obs_vs_mod_location <- ggplot()+
+    geom_line(data=bh.gull_mod_Pulawy_vp, aes(x=date, y=FLOW_OUTcms), color = "blue")+ #simulated
+    geom_line(data=bh.gull_obs_Pulawy_vp, aes(x=date, y=Q), color="red")+ #observed
     facet_wrap( ~ format(date, "%Y"), scales = "free_x", ncol=1)+ # free_x makes the plot narrow down to vulnerability period
     labs(x = "year", y="Streamflow") +
     ggtitle("Puławy") + 
@@ -116,9 +111,11 @@ Smieszka_obs_vs_sim_location <- ggplot()+
     theme(plot.title = element_text(hjust = 0.5))+#positioning the title in the center
     coord_cartesian( ylim = c(0, 6000))
 
-print(Smieszka_obs_vs_sim_location)
+print(bh.gull_obs_vs_mod_location)
   
-ggsave(Smieszka_obs_vs_sim_location, file = paste0("Q_mod_obs/b_gull/Smieszka_Pulawy.jpg", ".jpg"), #saving the plot into a folder
+ggsave(bh.gull_obs_vs_mod_location, 
+       file = paste0("D:/Ptaki_hydro/Obliczenia/R/Kalibracja_Q_PL/Q_mod_obs/bh_gull/Smieszka_Pulawy.jpg", 
+                     ".jpg"), #saving the plot into a folder
       device = "jpg",
       width = 8,
       height = 25)
@@ -134,8 +131,8 @@ min_max <- function (x){
                     ymax = max(x))
   return(dat)
   }
-
-graph_Smieszka_2004 <- ggplot(Smieszka2004, aes(x=date, y=FLOW_OUTcms))+ 
+# try for year 2004 (1st object in the list)
+graph_bh.gull_2004 <- ggplot(bh.gull_Q_mod_list[[1]], aes(x=date, y=FLOW_OUTcms))+ 
   stat_summary(geom = "line", fun= mean, color="olivedrab", size=1.1)+ 
   stat_summary(geom = "line", fun= min, color="grey")+ 
   stat_summary(geom = "line", fun= max, color="grey")+
@@ -143,10 +140,10 @@ graph_Smieszka_2004 <- ggplot(Smieszka2004, aes(x=date, y=FLOW_OUTcms))+
   scale_x_date(date_breaks = "10 days")+
   coord_cartesian( ylim = c(0, 4000))
 
-print(graph_Smieszka_2004)
+print(graph_bh.gull_2004)
 
-
-graph_Smieszka_2010 <- ggplot(Smieszka2010, aes(x=date, y=FLOW_OUTcms))+ 
+# try for year 2010 (7th object in the list)
+graph_bh.gull_2010 <- ggplot(bh.gull_Q_mod_list[[7]], aes(x=date, y=FLOW_OUTcms))+ 
   stat_summary(geom = "line", fun= mean, color="olivedrab", size=1.1)+ 
   stat_summary(geom = "line", fun= min, color="grey")+ 
   stat_summary(geom = "line", fun= max, color="grey")+
@@ -154,13 +151,11 @@ graph_Smieszka_2010 <- ggplot(Smieszka2010, aes(x=date, y=FLOW_OUTcms))+
   scale_x_date(date_breaks = "10 days")+
   coord_cartesian( ylim = c(0, 4000))
 
-print(graph_Smieszka_2010)
-
-
+print(graph_bh.gull_2010)
 
 ########### Q for all locations in single line plot ###############################
 
-Smieszka_line_plot <- function (x) {
+bh.gull_line_plot <- function (x) {
   ggplot(x, aes(date, FLOW_OUTcms, group = RCH)) +
     geom_line()+ 
     facet_wrap( ~ format(date, "%Y"), scales = "free_x", ncol=1)+
@@ -168,31 +163,33 @@ Smieszka_line_plot <- function (x) {
     coord_cartesian( ylim = c(0, 4000))
   }
 
-print(Smieszka_line_plot(Smieszka2004))
 ## apply it to a list
+bh.gull_line_plot_list <- lapply(bh.gull_Q_mod_list , bh.gull_line_plot)
 
-Smieszka_line_plot_list <- lapply(bh.gull_Q_mod_list , Smieszka_line_plot)
+# display the first graph from the list which is for year 2004
+plot(bh.gull_line_plot_list[[1]] )
 
 ########### GHANT CHART VULNERABILITY PERIOD
 
 library("reshape2")
 #11.04 - 10.06
-task1_bg <- c('Laying eggs', '2004-04-11', '2004-05-20')
-task2_bg <- c('Incubating', '2004-04-20', '2004-05-31')
-task3_bg <- c('Rearing chicks', '2004-05-01', '2004-06-10')
+task1_bh.gull <- c('Laying eggs', '2004-04-11', '2004-05-20')
+task2_bh.gull <- c('Incubating', '2004-04-20', '2004-05-31')
+task3_bh.gull <- c('Rearing chicks', '2004-05-01', '2004-06-10')
 
-vp_bg <- as.data.frame(rbind(task3_bg, task2_bg, task1_bg))
-names(vp_bg) <- c('task', 'start', 'end')
-vp_bg$task <- factor(vp_bg$task, levels = vp_bg$task)
-vp_bg$start <- as.Date(vp_bg$start)
-vp_bg$end <- as.Date(vp_bg$end)
-vp_bg_melted <- melt(vp_bg, measure.vars = c('start', 'end'))
+# vp - vulnerability period
+vp_bh.gull <- as.data.frame(rbind(task3_bh.gull, task2_bh.gull, task1_bh.gull))
+names(vp_bh.gull) <- c('task', 'start', 'end')
+vp_bh.gull$task <- factor(vp_bh.gull$task, levels = vp_bh.gull$task)
+vp_bh.gull$start <- as.Date(vp_bh.gull$start)
+vp_bh.gull$end <- as.Date(vp_bh.gull$end)
+vp_bh.gull_melted <- melt(vp_bh.gull, measure.vars = c('start', 'end'))
 
 # starting date to begin plot
 start_date <- as.Date('2004-04-11')
 
 
-B_gull_vp_plot <- ggplot(vp_bg_melted, aes(value, task)) + 
+bh.gull_vp_plot <- ggplot(vp_bh.gull_melted, aes(value, task)) + 
   geom_line(size = 7, colour="seagreen4") +
   labs(x = '', y = '', title = 'Vulnerability period') +
   theme_bw(base_size = 10) +
@@ -208,35 +205,40 @@ B_gull_vp_plot <- ggplot(vp_bg_melted, aes(value, task)) +
                                    '2004-04-20', '2004-05-31',
                                    '2004-05-01', '2004-06-10'))))
 
-print(B_gull_vp_plot)    
+print(bh.gull_vp_plot)    
 
 ################# COMBINING GRAPHS ON SINGLE PAGE
 
-
-#install.packages("ggpubr")
+install.packages("ggpubr")
 library("ggpubr")
-
 
 #ggarrange(plotlist = Smieszka_line_plot_list,nrow = 5,ncol = ceiling(length(Smieszka_line_plot_list)/2))
 
-Smieszka_line_plot_1 <- ggarrange(plotlist = Smieszka_line_plot_list,nrow = 15,ncol = 1)
+bh.gull_line_plot_1 <- ggarrange(plotlist = bh.gull_line_plot_list,nrow = 15,ncol = 1)
 
-b_gull_box_plot_2 <- ggarrange(plotlist = b_gull_box_sin_list,nrow = 15, ncol = 1)
+bh.gull_box_plot_2 <- ggarrange(plotlist = bh.gull_box_sin_list,nrow = 15, ncol = 1)
 
 #install.packages("patchwork")
 library("patchwork")
 
 #arrangement of plots with patchwork package
-b_gull_layout <- ((Smieszka_line_plot_1  + b_gull_box_plot_2))+
-                  B_gull_vp_plot +
+bh.gull_layout <- ((bh.gull_line_plot_1  + bh.gull_box_plot_2))+
+                  bh.gull_vp_plot +
                   plot_layout(width = c(1,0.5), height = c(3,0.3)) #width of 1st and 2nd column
                                                                     # hight of 1st row and 2nd row
 
 ### ??? aline the dates in the vulnerability period graph and hydrogrpahs
 ### ??? change the labels on the y axis to title of the columns
 
-print(b_gull_layout) 
+print(bh.gull_layout) 
 #save as width=700 and height=2000
+
+ggsave(bh.gull_layout, 
+       file = paste0("D:/Ptaki_hydro/Obliczenia/R/Kalibracja_Q_PL/Q_mod_obs/bh_gull/bh.gull_layout.jpg", 
+                     ".jpg"), #saving the plot into a folder
+       device = "jpg",
+       width = 7,
+       height = 20)
 
 # other packages for arrangement of plots
 #install.packages("grid")
@@ -263,6 +265,7 @@ library("xts")
 #install.packages("Rcpp")
 library("Rcpp")
 
+#Installing Jasons Law package IHA directly from his repository
 devtools::install_github("jasonelaw/iha", force = TRUE)
 
 # When asked
@@ -285,7 +288,6 @@ library("IHA")
 # laying eggs 11.04 - 20.05
 
 # incubating 20.04 - 31.05
-
 
 # rearing chicks 1.05 - 10.06
 
