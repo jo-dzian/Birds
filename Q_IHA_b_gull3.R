@@ -18,7 +18,7 @@ library("dplyr")
 #packrat - package that manages all the differences between versions of packages and R
 library("packrat")
 library("tibble")
-library("EflowStats")
+#library("EflowStats")
 library("ggplot2")
 library("lubridate")
 library("purrr")
@@ -209,7 +209,7 @@ print(bh.gull_vp_plot)
 
 ################# COMBINING GRAPHS ON SINGLE PAGE
 
-install.packages("ggpubr")
+#install.packages("ggpubr")
 library("ggpubr")
 
 #ggarrange(plotlist = Smieszka_line_plot_list,nrow = 5,ncol = ceiling(length(Smieszka_line_plot_list)/2))
@@ -534,24 +534,65 @@ bird_mean <- cbind(c_gull_mean,b_gull_mean)
 write.csv(bird_mean, "bird_mean.csv")
 
 
-####### Altering IHA functions ###############################################################33
+####### Altering IHA functions ###############################################################
 
-####### IHA group 1 Mean or median value for each calendar month replace with 
-# laying eggs 11.04 - 20.05
+##############################################################################################
+####### GROUP 1 ################################################################################
+####### IHA group 1 Mean or median value for each calendar month replaced with means for periods of
+#laying eggs, incubating and rearing chicks
 
+#### laying eggs 11.04 - 20.05 ################################
 bh.gull_interv_le1 <- as.interval(ddays(40), start = ISOdate(2004:2018, 4, 11, 0, tz = 'Europe/Warsaw'))
 bh.gull_interv_le2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_le1)
 bh.gull_interv_le3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_le2)]
 #Narrow down the Q data to vulnerability period
 bh.gull_interv_le <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_le3, ] 
-bh.gull_le_gr.1 <- mean()
 
-# incubating 20.04 - 31.05
+#calculate mean streamflow Q during the bh.gull vulnerability period for laying eggs 
+bh.gull_le_gr.1 <- aggregate(bh.gull_interv_le[, 7], list(bh.gull_interv_le$Year), mean) %>%
+  remove_rownames %>% 
+  column_to_rownames(var="Group.1")
+#change names of columns
+names(bh.gull_le_gr.1)[names(bh.gull_le_gr.1) == 'x'] <- 'gr.1 mean LE'
 
-# rearing chicks 1.05 - 10.06
+#### incubating 20.04 - 31.05 ###################################
+bh.gull_interv_i1 <- as.interval(ddays(41), start = ISOdate(2004:2018, 4, 21, 0, tz = 'Europe/Warsaw'))
+bh.gull_interv_i2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_i1)
+bh.gull_interv_i3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_i2)]
+#Narrow down the Q data to vulnerability period
+bh.gull_interv_i <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_i3, ] 
+
+#calculate mean streamflow Q during the bh.gull vulnerability period for incubation 
+bh.gull_i_gr.1 <- aggregate(bh.gull_interv_i[, 7], list(bh.gull_interv_i$Year), mean) %>%
+  remove_rownames %>% 
+  column_to_rownames(var="Group.1")
+#change names of columns
+names(bh.gull_i_gr.1)[names(bh.gull_i_gr.1) == 'x'] <- 'gr.1 mean Incub'
+
+### rearing chicks 1.05 - 10.06 #################################
+bh.gull_interv_rc1 <- as.interval(ddays(41), start = ISOdate(2004:2018, 5, 1, 0, tz = 'Europe/Warsaw'))
+bh.gull_interv_rc2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_rc1)
+bh.gull_interv_rc3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_rc2)]
+#Narrow down the Q data to vulnerability period
+bh.gull_interv_rc <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_rc3, ] 
+
+#calculate mean streamflow Q during the bh.gull vulnerability period for rearing chicks 
+bh.gull_rc_gr.1 <- aggregate(bh.gull_interv_rc[, 7], list(bh.gull_interv_rc$Year), mean) %>%
+  remove_rownames %>% 
+  column_to_rownames(var="Group.1")
+#change names of columns
+names(bh.gull_rc_gr.1)[names(bh.gull_rc_gr.1) == 'x'] <- 'gr.1 mean RC'
+
+#### joining results into single dataframe
+bh.gull_gr.1 <- cbind(bh.gull_le_gr.1, bh.gull_i_gr.1, bh.gull_rc_gr.1)
+
+#
+##############################################################################################
+####### GROUP 2 ################################################################################
+####### IHA group 2 is Magnitude  and duration of annual extreme  water condition 
+# ( eg. 3-day min and max) 
 
 
-####### IHA group2 with a user definied period
 
 library(plyr)
 library(lubridate)
@@ -568,19 +609,28 @@ group2WithPeriod <- function (x, period, year = c("water", "calendar"), mimic.tn
   return(res)
 } 
 
-group2WithPeriod(bullrun, quarters(index(bullrun))) # eg. second quarter (i.e. Q2) of the year
+x <- group2WithPeriod(bullrun, quarters(index(bullrun))) # eg. second quarter (i.e. Q2) of the year
 
 
 # You can create an appropriate vector for the period argument using something like:
 
-Smieszka_sub_1545
-for (i in 1:length(RCH_split_bg)) {
-  assign(Smieszka_new_sub_names[i], RCH_split_bg[[i]]%>%       
+for (i in 1:length(RCH_split_bh.gull)) {
+  assign(bh.gull_new_sub_names[i], RCH_split_bh.gull[[i]]%>%       
            dplyr::select(FLOW_OUTcms, date))
 }
 
-Smieszka_sub_1545$date2 <- as.POSIXct(Smieszka_sub_1545$date, format= ("%Y-%m-%d"), tz="GMT" )# doesn't have time
+RCH_split$date2 <- lapply(as.POSIXct(RCH_split$date, format= ("%Y-%m-%d"), tz="GMT" ))# doesn't have time
 
+RCH_split <- lapply( as.POSIXct((RCH_split,"[",, c(10) ), format= ("%Y-%m-%d"), tz="GMT"))
+
+lapply(RCH_split, "[", , c(10))
+
+RCH_split$date2 <- lapply(RCH_split$date, as.POSIXct, format= ("%Y-%m-%d"), tz="GMT")
+RCH_split<-lapply(RCH_split, function(x) 
+  cbind(x, date2 = date))
+
+
+#
 Smieszka_sub_1545 <- select(Smieszka_sub_1545, c(1,3))
 
 little.gull <- as.interval(ddays(60), start = ISOdate(2004:2018, 5, 11)) # has time
@@ -592,5 +642,151 @@ v <- format(as.POSIXct(v,format='%m/%d/%Y %H:%M:%S'),format='%m/%d/%Y')
 
 # Just watch your timezones!
 
+### test 24.08.2020
+
+library(IHA)
+library(plyr)
+library(lubridate)
+data(bullrun)
+
+group2WithPeriod <- function (x, period, year = c("water", "calendar"), mimic.tnc = T, ...) {
+  stopifnot(is.zoo(x), inherits(index(x), "Date") | inherits(index(x), 
+                                                             "POSIXt"))
+  year <- match.arg(year)
+  yr <- switch(year, water = IHA::water.year(index(x)), calendar = year(index(x)))
+  rollx <- IHA::runmean.iha(x, year = yr, mimic.tnc = mimic.tnc)
+  xd <- cbind(year = yr, period = period, as.data.frame(rollx))
+  res <- ddply(xd, .(year, period), function(x) IHA::group2Funs(x[, -(1:2)]), ...)
+  return(res)
+} 
 
 
+abr <- group2WithPeriod(bullrun, quarters(index(bullrun)))
+
+
+library(lubridate)
+
+isVulnerable <- function(x, month, day, length){
+  stopifnot(is.duration(length), is.POSIXct(x) | is.Date(x))
+  mx <- max(year(x))
+  mn <- min(year(x))
+  ints <- as.interval(length, as.Date(ISOdate(mn:mx, month, day, tz = tz(x))))
+  x %within% as.list(ints)
+}
+
+(11.05 - 10.07)
+little.gull <- as.interval(ddays(60), start = ISOdate(2010:2019, 5, 11, 0, tz = 'America/Los_angeles'))
+is.breeding <- index(bullrun) %within% as.list(little.gull)
+index(bullrun)[which(is.breeding)]
+
+interval("2008-05-11T00:00:00/P60D", tz = 'America/Los_angeles')
+
+
+br <- data.frame(flow = coredata(bullrun), date = index(bullrun))
+
+library(dplyr)
+
+br$is.vulnerable <- isVulnerable(br$date, 4, 11, ddays(60))
+
+br %>%
+  group_by(year(date),is.vulnerable) %>%
+  summarize(md = median(flow))
+
+group2 <- 
+  function (x, is.vulnerable, year = c("water", "calendar"), mimic.tnc = T, 
+            ...) 
+  {
+    stopifnot(is.zoo(x), inherits(index(x), "Date") | inherits(index(x), 
+                                                               "POSIXt"))
+    year <- match.arg(year)
+    yr <- switch(year, water = water.year(index(x)), calendar = year(index(x)))
+    rollx <- runmean.iha(x, year = yr, mimic.tnc = mimic.tnc)
+    xd <- cbind(year = yr, is.vulnerable = is.vulnerable, as.data.frame(rollx))
+    res <- ddply(xd, .(year, is.vulnerable), function(x) group2Funs(x[, -(1:2)]), 
+                 ...)
+    return(res)
+  }
+
+br2 <- group2(br, year = c("calendar"))
+
+
+#### GROUP 3
+
+
+`group3` <- function (x, year = c('water', 'calendar'), mimic.tnc = F){
+  ihaRange <- function(x, mimic.tnc){
+    if (mimic.tnc){
+      return(yday2(which.range.zoo(x)))
+    } else {
+      return(yday(c(which.range.zoo(x))))
+    }
+  }
+  stopifnot(is.zoo(x), inherits(index(x), 'Date') | inherits(index(x), 'POSIXt'))
+  year <- match.arg(year)
+  yr <- switch(year,
+               water = water.year(index(x)),
+               calendar = year(index(x)))
+  sx <- split(x, yr)
+  
+  res <- sapply(sx, ihaRange, mimic.tnc = mimic.tnc)
+  dimnames(res)[[1]] <- c("Min", "Max")
+  return(t(res))
+}
+
+################ Create data frames for each subbasin
+RCH_split <- split(Q_mod_Wisla, Q_mod_Wisla$RCH)
+RCH_split[[1]]
+
+#################### CREATING STREAMFLOW AND DATE DATA FRAME PER SUBBASIN
+#seting the prefix that's going to appear in each new data frame name
+prefix1_bh.gull <- "bh.gull_sub"
+#setting the structure of the data frame name
+bh.gull_new_sub_names <- paste(prefix1_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
+
+### Loop for creating all data frames in single go
+### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
+
+for (i in 1:length(RCH_split_bh.gull)) {
+  assign(bh.gull_new_sub_names[i], RCH_split_bh.gull[[i]]%>%       
+           remove_rownames %>% 
+           column_to_rownames(var="date")%>%
+           dplyr::select(FLOW_OUTcms))
+}
+
+#### Calculate IHA FUNCTION
+calc_IHA_sub <- function(x) { 
+  x1 <- as.xts(x, format="%Y-%m-%d")  
+  g2 <- group2(x1) 
+  g3 <- group3(x1, year = c("calendar")) 
+  g4 <- group4(x1, year = c("calendar")) 
+  g5 <- group5(x1, year = c("calendar")) 
+  df <- cbind(g2, g3, g4, g5) 
+  out<- df[ -c(1,10,11,12)]# columns which are not needed
+  print(out)
+}
+
+#################### CREATING YEAR AND IHA DATA FRAME PER SUBBASIN
+
+#seting the prefix that's going to appear in each new data frame name
+prefix2_bh.gull <- "bh.gull_IHA_sub"
+#setting the structure of the data frame name
+bh.gull_IHA_sub_names <- paste(prefix2_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
+
+### Loop for creating all data frames in single go
+### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
+
+for (i in 1:length(RCH_split_bh.gull)) {
+  assign(bh.gull_IHA_sub_names[i], RCH_split_bh.gull[[i]]%>%       
+           remove_rownames %>% 
+           column_to_rownames(var="date")%>%
+           dplyr::select(FLOW_OUTcms)%>%
+           calc_IHA_sub)
+}
+
+######## TEST
+# b_gull no. column or Xno of island location
+#island_reach lookup table island and matching subbasin
+# Smieszka_IHA_sub_ with subbasin number
+#cbind col
+
+hjjnb <- group3(Q_mod_Wisla, year=("calendar"))

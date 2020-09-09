@@ -75,7 +75,6 @@ ggplot(birds_list2, aes(x=group, y=value, fill=id)) +
   scale_fill_brewer(palette = "Dark2")+
   theme(axis.ticks.x = element_blank())
 
-#????????? TRASH????###################################################################################
 ############ individual box plot ################################
 
 # function to draw box plots
@@ -91,6 +90,7 @@ library("dplyr")
 bh.gull.m_list <- bh_gull.m %>% group_split(bh_gull.m$group)
 
 #apply the function to a list withindividual years
+#needed in the script Q_IHA_b_gull3
 bh.gull_box_sin_list <- lapply(bh.gull.m_list, bh.gull_box_sin)
 
 
