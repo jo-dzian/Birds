@@ -9,8 +9,8 @@ library ("ggplot2")
 
 Sys.setlocale(category = "LC_ALL", locale = "Polish")
 #setwd("D:/Ptaki_hydro/Obliczenia/R/Kalibracja_Q_PL")
-
 setwd("C:/Users/Arthur/OneDrive - sggw.pl/doktorat/R/Kalibracja_Q_PL")
+
 
 observed_Q <- read.csv("codz.csv", header = FALSE)
 print(max(observed_Q$V4))

@@ -283,7 +283,15 @@ devtools::install_github("jasonelaw/iha", force = TRUE)
 library("IHA")
 
 
-################ Create data frames for each subbasin
+################ Create data frames for each subbasin for the whole year
+RCH_split <- split(Q_mod_Wisla, Q_mod_Wisla$RCH)
+
+#add a year column
+RCH_split <- lapply(RCH_split, function(x) {
+  x$Year <- format(as.Date(x$date, format="%Y-%m-%d"),"%Y")
+  x
+  })
+################ Create data frames for each subbasin for vulnerability period
 RCH_split_bh.gull <- split(bh.gull_Q_mod, bh.gull_Q_mod$RCH)
 
 #################### CREATING STREAMFLOW AND DATE DATA FRAME PER SUBBASIN
@@ -429,111 +437,6 @@ corrplot(bh.gull_matrix, method = "number")
 
 
 
-############################ CURRENTY WORKING HERE 20th of May ##########################################
-######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
-
-# use only b_gull_list
-
-# We plot the independent variable on the x axis and the dependent variable on the y axis.
-# Regression analysis also gives us a value called R^2, R squared. This tells us how much of the variation 
-# in the y axis variable's values is accounted for by the variation in the x axis variable's values.
-
-#### ???? I'm not sure if I asigned x and y correctly
-
-# IHA 1
-list_day_1_min_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1:2))#select 1st and 2nd collumn
-                   
-colnames1 <- c("NS", "day_1_min")#set names in the collumn              
-                   
-list_day_1_min_indv_b_gull <- lapply(list_day_1_min_indv_b_gull, setNames, colnames1)# change collumn names                   
-
-list_day_1_min_b_gull <- do.call("rbind", list_day_1_min_indv_b_gull) # merge the 22 lists for individual locations into 1
-
-day_1_min_plot_b_gull <- ggscatter(list_day_1_min_b_gull, x = "NS", y = "day_1_min", add = "reg.line", conf.int = TRUE,
-          add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
-
-plot(day_1_min_plot_b_gull)
-
-# IHA 2
-list_day_1_max_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,3))#select 1st and 3nd collumn
-
-colnames2 <- c("NS", "day_1_max")#set names in the collumn              
-
-list_day_1_max_indv_b_gull <- lapply(list_day_1_max_indv_b_gull, setNames, colnames2)# change collumn names                   
-
-list_day_1_max_b_gull <- do.call("rbind", list_day_1_max_indv_b_gull) # merge the 22 lists for individual locations into 1
-
-day_1_max_plot_b_gull <- ggscatter(list_day_1_max_b_gull, x = "NS", y = "day_1_max", add = "reg.line", conf.int = TRUE,
-                                         add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
-
-plot(day_1_max_plot_b_gull)
-
-# IHA 15 High pulse lenght
-list_hp_length_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,15))#select 1st and 15th collumn
-
-colnames15 <- c("NS", "hp_length")#set names in the collumn              
-
-list_hp_length_indv_b_gull <- lapply(list_hp_length_indv_b_gull, setNames, colnames15)# change collumn names                   
-
-list_hp_length_b_gull <- do.call("rbind", list_hp_length_indv_b_gull) # merge the 22 lists for individual locations into 1
-
-hp_length_plot_b_gull <- ggscatter(list_hp_length_b_gull, x = "NS", y = "hp_length", add = "reg.line", conf.int = TRUE,
-                                   add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
-
-plot(hp_length_plot_b_gull)
-matrix_hp_length_b_gull <- cor(list_hp_length_b_gull,  use = "pairwise.complete.obs", method = c("pearson"))
-
-
-# IHA 16 Rise rate
-list_rise_rate_indv_b_gull <- lapply(b_gull_list, function(x) x%>% select(1,16))#select 1st and 16th collumn
-
-colnames16 <- c("NS", "Rise_rate")#set names in the collumn              
-
-list_rise_rate_indv_b_gull <- lapply(list_rise_rate_indv_b_gull, setNames, colnames16)# change collumn names                   
-
-list_rise_rate_b_gull <- do.call("rbind", list_rise_rate_indv_b_gull) # merge the 22 lists for individual locations into 1
-
-rise_rate_plot_b_gull <- ggscatter(list_rise_rate_b_gull, x = "NS", y = "Rise_rate", add = "reg.line", conf.int = TRUE,
-                                   add.params = list(color = "blue", fill = "lightgray"), cor.coef = TRUE, cor.method = "pearson") 
-
-plot(rise_rate_plot_b_gull)
-
-# calculate the correlation
-matrix_rise_rate_b_gull <- as.data.frame(cor(list_rise_rate_b_gull,  use = "pairwise.complete.obs", method = c("pearson")))
-
-# drop the 1st column and 2nd row
-matrix_rise_rate_b_gull1 <- as.data.frame (matrix_rise_rate_b_gull[2,1])
-
-
-
-#### LIST
-
-cor_iha_b_gull_list <- list(
-  list_day_1_min_b_gull, # 1
-  list_day_1_max_b_gull, # 2
-  list_hp_length_b_gull, # 15
-  list_rise_rate_b_gull) # 16
-
-
-cor_iha_b_gull_matrix <- lapply(cor_iha_b_gull_list, cor, use = "pairwise.complete.obs",method = c("pearson"))
-
-#extract the first row of the correlation matrix from each list (correlation between NS and IHA values in a location)
-cor_iha_b_gull_matrix_all <- do.call(rbind, lapply(cor_iha_b_gull_matrix, head, 2))
-
-#remove the 1st columns with 100% correlation (correlation between NS and NS)
-#cor_iha_b_gull <- cor_iha_b_gull_matrix_all[ ,-1]
-
-plot_test <- corrplot(cor_iha_b_gull_matrix_all, method = "number")
-
-
-### Summary
-b_gull_mean <- as.data.frame(colMeans(b_gull_matrix, na.rm = TRUE)) 
-
-bird_mean <- cbind(c_gull_mean,b_gull_mean)
-
-write.csv(bird_mean, "bird_mean.csv")
-
-
 ####### Altering IHA functions ###############################################################
 
 ##############################################################################################
@@ -541,52 +444,99 @@ write.csv(bird_mean, "bird_mean.csv")
 ####### IHA group 1 Mean or median value for each calendar month replaced with means for periods of
 #laying eggs, incubating and rearing chicks
 
-#### laying eggs 11.04 - 20.05 ################################
+######### laying eggs 11.04 - 20.05 ################################
 bh.gull_interv_le1 <- as.interval(ddays(40), start = ISOdate(2004:2018, 4, 11, 0, tz = 'Europe/Warsaw'))
 bh.gull_interv_le2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_le1)
-bh.gull_interv_le3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_le2)]
-#Narrow down the Q data to vulnerability period
-bh.gull_interv_le <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_le3, ] 
+bh.gull_interv_le3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_le2)] # values date format
+##Narrow down the Q data to vulnerability period
+# unlisted
+#bh.gull_interv_le <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_le3, ] 
+# for list
+bh.gull_interv_le_list <- lapply(RCH_split_bh.gull, function(x) {
+  x[x$date %in% bh.gull_interv_le3, ]  })
 
-#calculate mean streamflow Q during the bh.gull vulnerability period for laying eggs 
-bh.gull_le_gr.1 <- aggregate(bh.gull_interv_le[, 7], list(bh.gull_interv_le$Year), mean) %>%
+##calculate mean streamflow Q during the bh.gull vulnerability period for laying eggs 
+# unlisted
+#bh.gull_le_gr.1 <- aggregate(bh.gull_interv_le[, 7], list(bh.gull_interv_le$Year), mean) %>%
+#  remove_rownames %>% 
+#  column_to_rownames(var="Group.1")
+
+# for list
+bh.gull_le_gr.1_list <- lapply(bh.gull_interv_le_list, function(x) {
+  aggregate(x$FLOW_OUTcms, list(x$Year), mean) %>%
   remove_rownames %>% 
-  column_to_rownames(var="Group.1")
-#change names of columns
-names(bh.gull_le_gr.1)[names(bh.gull_le_gr.1) == 'x'] <- 'gr.1 mean LE'
+  column_to_rownames(var="Group.1")})
 
-#### incubating 20.04 - 31.05 ###################################
+##change names of columns
+# unlisted
+#names(bh.gull_le_gr.1)[names(bh.gull_le_gr.1) == 'x'] <- 'gr.1 mean LE'
+
+######### incubating 20.04 - 31.05 ###################################
 bh.gull_interv_i1 <- as.interval(ddays(41), start = ISOdate(2004:2018, 4, 21, 0, tz = 'Europe/Warsaw'))
 bh.gull_interv_i2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_i1)
 bh.gull_interv_i3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_i2)]
 #Narrow down the Q data to vulnerability period
-bh.gull_interv_i <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_i3, ] 
+## unlisted
+#bh.gull_interv_i <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_i3, ] 
+#for list
+bh.gull_interv_i_list <- lapply(RCH_split_bh.gull, function(x) {
+  x[x$date %in% bh.gull_interv_i3, ]  })
 
 #calculate mean streamflow Q during the bh.gull vulnerability period for incubation 
-bh.gull_i_gr.1 <- aggregate(bh.gull_interv_i[, 7], list(bh.gull_interv_i$Year), mean) %>%
-  remove_rownames %>% 
-  column_to_rownames(var="Group.1")
+# unlisted
+#bh.gull_i_gr.1 <- aggregate(bh.gull_interv_i[, 7], list(bh.gull_interv_i$Year), mean) %>%
+#  remove_rownames %>% 
+#  column_to_rownames(var="Group.1")
+
+# for list
+bh.gull_i_gr.1_list <- lapply(bh.gull_interv_i_list, function(x) {
+  aggregate(x$FLOW_OUTcms, list(x$Year), mean) %>%
+    remove_rownames %>% 
+    column_to_rownames(var="Group.1")})
+
 #change names of columns
-names(bh.gull_i_gr.1)[names(bh.gull_i_gr.1) == 'x'] <- 'gr.1 mean Incub'
+# unlisted
+#names(bh.gull_i_gr.1)[names(bh.gull_i_gr.1) == 'x'] <- 'gr.1 mean Incub'
 
 ### rearing chicks 1.05 - 10.06 #################################
 bh.gull_interv_rc1 <- as.interval(ddays(41), start = ISOdate(2004:2018, 5, 1, 0, tz = 'Europe/Warsaw'))
 bh.gull_interv_rc2 <- bh.gull_Q_mod$date %within% as.list(bh.gull_interv_rc1)
 bh.gull_interv_rc3 <- (bh.gull_Q_mod$date)[which(bh.gull_interv_rc2)]
 #Narrow down the Q data to vulnerability period
-bh.gull_interv_rc <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_rc3, ] 
+#unlisted
+#bh.gull_interv_rc <- bh.gull_Q_mod[bh.gull_Q_mod$date %in% bh.gull_interv_rc3, ] 
+#for list
+bh.gull_interv_rc_list <- lapply(RCH_split_bh.gull, function(x) {
+  x[x$date %in% bh.gull_interv_rc3, ]  })
 
 #calculate mean streamflow Q during the bh.gull vulnerability period for rearing chicks 
-bh.gull_rc_gr.1 <- aggregate(bh.gull_interv_rc[, 7], list(bh.gull_interv_rc$Year), mean) %>%
-  remove_rownames %>% 
-  column_to_rownames(var="Group.1")
+#unlisted
+#bh.gull_rc_gr.1 <- aggregate(bh.gull_interv_rc[, 7], list(bh.gull_interv_rc$Year), mean) %>%
+#  remove_rownames %>% 
+#  column_to_rownames(var="Group.1")
+
+#for list
+bh.gull_rc_gr.1_list <- lapply(bh.gull_interv_rc_list, function(x) {
+  aggregate(x$FLOW_OUTcms, list(x$Year), mean) %>%
+    remove_rownames %>% 
+    column_to_rownames(var="Group.1")})
+
 #change names of columns
-names(bh.gull_rc_gr.1)[names(bh.gull_rc_gr.1) == 'x'] <- 'gr.1 mean RC'
+#unlisted
+#names(bh.gull_rc_gr.1)[names(bh.gull_rc_gr.1) == 'x'] <- 'gr.1 mean RC'
 
 #### joining results into single dataframe
-bh.gull_gr.1 <- cbind(bh.gull_le_gr.1, bh.gull_i_gr.1, bh.gull_rc_gr.1)
+#unlisted
+#bh.gull_gr.1 <- cbind(bh.gull_le_gr.1, bh.gull_i_gr.1, bh.gull_rc_gr.1)
 
-#
+#for list
+bh.gull_list_gr.1 <- mapply(cbind, bh.gull_le_gr.1_list,bh.gull_i_gr.1_list, bh.gull_rc_gr.1_list, SIMPLIFY=FALSE)
+
+##change names of columns in the list
+colnames.gr1 = c("gr.1 mean LE","gr.1 mean Incub", "gr.1 mean RC") 
+bh.gull_list_gr.1 <- lapply(bh.gull_list_gr.1, setNames, colnames.gr1)
+
+
 ##############################################################################################
 ####### GROUP 2 ################################################################################
 ####### IHA group 2 is Magnitude  and duration of annual extreme  water condition 
@@ -595,8 +545,14 @@ bh.gull_gr.1 <- cbind(bh.gull_le_gr.1, bh.gull_i_gr.1, bh.gull_rc_gr.1)
 library("zoo")
 
 #calculating rolling 1,3 an 7 day mean
+Q_mod_Wisla_roll_list <- RCH_split %>%
+  lapply(dplyr::mutate(day01_mean = zoo::rollmean (FLOW_OUTcms, k = 1, fill = NA), #we have 1 measurment per day so this is acctually not necessary to calculate
+                day03_mean = zoo::rollmean (FLOW_OUTcms, k = 3, fill = NA),
+                day07_mean = zoo::rollmean (FLOW_OUTcms, k = 7, fill = NA)))
+
+#calculating rolling 1,3 an 7 day mean
 Q_mod_Wisla_roll <- Q_mod_Wisla %>%
-dplyr::arrange(desc(RCH)) %>% 
+dplyr::arrange(desc(date)) %>% 
   dplyr::group_by(RCH) %>% 
   dplyr::mutate(day01_mean = zoo::rollmean (FLOW_OUTcms, k = 1, fill = NA), #we have 1 measurment per day so this is acctually not necessary to calculate
                 day03_mean = zoo::rollmean (FLOW_OUTcms, k = 3, fill = NA),
@@ -638,81 +594,57 @@ listtest1 <- aggregate(day01_mean ~ Year, data= Q_mod_Wisla_roll_vp_bh.gull, min
 
 #### GROUP 3
 
+#Calculate IHA for all subbasins
+#install.packages("zoo")
+library("zoo")
 
-`group3` <- function (x, year = c('water', 'calendar'), mimic.tnc = F){
-  ihaRange <- function(x, mimic.tnc){
-    if (mimic.tnc){
-      return(yday2(which.range.zoo(x)))
-    } else {
-      return(yday(c(which.range.zoo(x))))
-    }
-  }
-  stopifnot(is.zoo(x), inherits(index(x), 'Date') | inherits(index(x), 'POSIXt'))
-  year <- match.arg(year)
-  yr <- switch(year,
-               water = water.year(index(x)),
-               calendar = year(index(x)))
-  sx <- split(x, yr)
-  
-  res <- sapply(sx, ihaRange, mimic.tnc = mimic.tnc)
-  dimnames(res)[[1]] <- c("Min", "Max")
-  return(t(res))
-}
+#install.packages("xts")
+library("xts")
 
-################ Create data frames for each subbasin
-RCH_split <- split(Q_mod_Wisla, Q_mod_Wisla$RCH)
-RCH_split[[1]]
+#install.packages("caTools")
+install.packages("IHA", repos="http://R-Forge.R-project.org")
+library("IHA")
 
-#################### CREATING STREAMFLOW AND DATE DATA FRAME PER SUBBASIN
-#seting the prefix that's going to appear in each new data frame name
-prefix1_bh.gull <- "bh.gull_sub"
-#setting the structure of the data frame name
-bh.gull_new_sub_names <- paste(prefix1_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
+#install.packages("Rcpp")
+library("Rcpp")
 
-### Loop for creating all data frames in single go
-### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
+#Installing Jasons Law package IHA directly from his repository
+devtools::install_github("jasonelaw/iha", force = TRUE)
 
-for (i in 1:length(RCH_split_bh.gull)) {
-  assign(bh.gull_new_sub_names[i], RCH_split_bh.gull[[i]]%>%       
-           remove_rownames %>% 
-           column_to_rownames(var="date")%>%
-           dplyr::select(FLOW_OUTcms))
-}
+# When asked
+# These packages have more recent versions available.
+# It is recommended to update all of them.
+# Which would you like to update?
 
-#### Calculate IHA FUNCTION
-calc_IHA_sub <- function(x) { 
-  x1 <- as.xts(x, format="%Y-%m-%d")  
-  g2 <- group2(x1) 
-  g3 <- group3(x1, year = c("calendar")) 
-  g4 <- group4(x1, year = c("calendar")) 
-  g5 <- group5(x1, year = c("calendar")) 
-  df <- cbind(g2, g3, g4, g5) 
-  out<- df[ -c(1,10,11,12)]# columns which are not needed
-  print(out)
-}
+#1: All                        
+#2: CRAN packages only         
+#3: None                       
+#4: zoo (1.8-7 -> 1.8-8) [CRAN]
 
-#################### CREATING YEAR AND IHA DATA FRAME PER SUBBASIN
+# I've picked 3
 
-#seting the prefix that's going to appear in each new data frame name
-prefix2_bh.gull <- "bh.gull_IHA_sub"
-#setting the structure of the data frame name
-bh.gull_IHA_sub_names <- paste(prefix2_bh.gull,sep="_",(as.character(unique(bh.gull_Q_mod$RCH))))
+library("IHA")
 
-### Loop for creating all data frames in single go
-### Prepare Q data for calculating IHA: function to have a single column with Q and date as row name
+#bh.gull vp:
+#  11.04 is 101 or 102 (Leap) julian day
+#  10.06 is 161 or 162 (Leap) julian day
+# Leap years: 2004, 2008, 2012, 2016
 
-for (i in 1:length(RCH_split_bh.gull)) {
-  assign(bh.gull_IHA_sub_names[i], RCH_split_bh.gull[[i]]%>%       
-           remove_rownames %>% 
-           column_to_rownames(var="date")%>%
-           dplyr::select(FLOW_OUTcms)%>%
-           calc_IHA_sub)
-}
+#add julian day
+RCH_split <- lapply(RCH_split, function(x) {
+  x$julian <- yday(x$date);return(x)})
 
-######## TEST
-# b_gull no. column or Xno of island location
-#island_reach lookup table island and matching subbasin
-# Smieszka_IHA_sub_ with subbasin number
-#cbind col
+#
 
-hjjnb <- group3(Q_mod_Wisla, year=("calendar"))
+
+######################################################################
+######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
+
+# use only b_gull_list
+
+# We plot the independent variable on the x axis and the dependent variable on the y axis.
+# Regression analysis also gives us a value called R^2, R squared. This tells us how much of the variation 
+# in the y axis variable's values is accounted for by the variation in the x axis variable's values.
+
+#### ???? I'm not sure if I asigned x and y correctly
+
