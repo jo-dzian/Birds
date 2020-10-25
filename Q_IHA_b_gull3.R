@@ -13,7 +13,7 @@ install.packages("purrr")
 
 library(readr)
 library("tidyverse")
-library(plyr)
+library("plyr")
 library("dplyr")
 #packrat - package that manages all the differences between versions of packages and R
 library("packrat")
@@ -544,13 +544,13 @@ bh.gull_list_gr.1 <- lapply(bh.gull_list_gr.1, setNames, colnames.gr1)
 
 library("zoo")
 
-#calculating rolling 1,3 an 7 day mean
+#calculating rolling 1,3 an 7 day mean on list
 Q_mod_Wisla_roll_list <- RCH_split %>%
   lapply(dplyr::mutate(day01_mean = zoo::rollmean (FLOW_OUTcms, k = 1, fill = NA), #we have 1 measurment per day so this is acctually not necessary to calculate
                 day03_mean = zoo::rollmean (FLOW_OUTcms, k = 3, fill = NA),
                 day07_mean = zoo::rollmean (FLOW_OUTcms, k = 7, fill = NA)))
 
-#calculating rolling 1,3 an 7 day mean
+#calculating rolling 1,3 an 7 day mean on data frame
 Q_mod_Wisla_roll <- Q_mod_Wisla %>%
 dplyr::arrange(desc(date)) %>% 
   dplyr::group_by(RCH) %>% 
@@ -572,7 +572,6 @@ Q_mod_Wisla_roll_vp_bh.gull_list <-
 
 # calculate the minimum and maximum per year per RCH
  
-#woooohoo
 library(dplyr)
 bh.gull_list_gr.2 <- lapply(Q_mod_Wisla_roll_vp_bh.gull_list,function(x) 
   ddply(x,.(RCH,Year), summarize,
@@ -580,50 +579,21 @@ bh.gull_list_gr.2 <- lapply(Q_mod_Wisla_roll_vp_bh.gull_list,function(x)
         day03_min=min(day03_mean), day03_max=max(day03_mean),
         day07_min=min(day07_mean), day07_max=max(day07_mean) 
         ))
-
-#działa
+#
 listtest3 <-lapply(Q_mod_Wisla_roll_vp_bh.gull_list, function(x) 
   aggregate(day01_mean ~ Year, data = x, FUN = "min"))
-  
-#działa
+#
 listtest1 <- aggregate(day01_mean ~ Year, data= Q_mod_Wisla_roll_vp_bh.gull, min)
   
 #??? I need to do it separately for each reach so then I can look at the regression with nesting success
 # in particulat location
 
 
-#### GROUP 3
+##############################################################################################
+####### GROUP 3 ################################################################################
+####### IHA group 2 is  Timing of annual extreme water conditions,
+#Julian date of each annual 1-day maximum and 1-day minimum 
 
-#Calculate IHA for all subbasins
-#install.packages("zoo")
-library("zoo")
-
-#install.packages("xts")
-library("xts")
-
-#install.packages("caTools")
-install.packages("IHA", repos="http://R-Forge.R-project.org")
-library("IHA")
-
-#install.packages("Rcpp")
-library("Rcpp")
-
-#Installing Jasons Law package IHA directly from his repository
-devtools::install_github("jasonelaw/iha", force = TRUE)
-
-# When asked
-# These packages have more recent versions available.
-# It is recommended to update all of them.
-# Which would you like to update?
-
-#1: All                        
-#2: CRAN packages only         
-#3: None                       
-#4: zoo (1.8-7 -> 1.8-8) [CRAN]
-
-# I've picked 3
-
-library("IHA")
 
 #bh.gull vp:
 #  11.04 is 101 or 102 (Leap) julian day
@@ -634,7 +604,27 @@ library("IHA")
 RCH_split <- lapply(RCH_split, function(x) {
   x$julian <- yday(x$date);return(x)})
 
-#
+bh.gull_list_gr.3 <- lapply(RCH_split,function(x) 
+  ddply(x,.(RCH,Year), summarize,
+        min=min(FLOW_OUTcms), max=max(FLOW_OUTcms),
+        julian_min= which.min(FLOW_OUTcms),
+        julian_max= which.max(FLOW_OUTcms),#gives julian day of the min/max 
+        # i dont understand how this above works as it doesn't specify i want the value from the julian column
+        # I sppose it counted the order of the value occurence in each year without using the julian column
+        #chech if julian date is within vulnerability period range (101 and 162 days) and count as 1 if yes, 0 as no.
+        vp_min = case_when(julian_min >= 101 & julian_min <= 162 ~ 1, TRUE ~ 0),
+        vp_max = case_when(julian_max >= 101 & julian_max <= 162 ~ 1, TRUE ~ 0)))
+
+
+##############################################################################################
+####### GROUP 4 ################################################################################
+####### IHA group 2 is  Frequency and duration of high and low pulses
+# Number of low pulses within each water year, Mean or median duration of low pulses (days),
+# Number of high pulses within each water year, Mean or median duration of high pulses (days)
+
+
+
+
 
 
 ######################################################################
