@@ -567,12 +567,15 @@ Q_mod_Wisla_roll_vp_bh.gull$Year <-
   format(as.Date(Q_mod_Wisla_roll_vp_bh.gull$date, format="%Y-%m-%d"),"%Y")
 
 #Create lists according to RCH
+RCH_names <- c(910,950,1012,1087,1134,1240,1264,1289,1329,1358,1501,1545,1565,1601,1629,1727,1746,1875)
+
 Q_mod_Wisla_roll_vp_bh.gull_list <- 
-  Q_mod_Wisla_roll_vp_bh.gull %>% group_split(Q_mod_Wisla_roll_vp_bh.gull$RCH) 
+  Q_mod_Wisla_roll_vp_bh.gull %>% group_split(Q_mod_Wisla_roll_vp_bh.gull$RCH) %>% setNames(RCH_names)
+
 
 # calculate the minimum and maximum per year per RCH
  
-library(dplyr)
+library(plyr)
 bh.gull_list_gr.2 <- lapply(Q_mod_Wisla_roll_vp_bh.gull_list,function(x) 
   ddply(x,.(RCH,Year), summarize,
         day01_min=min(day01_mean), day01_max=max(day01_mean),
@@ -591,7 +594,7 @@ listtest1 <- aggregate(day01_mean ~ Year, data= Q_mod_Wisla_roll_vp_bh.gull, min
 
 ##############################################################################################
 ####### GROUP 3 ################################################################################
-####### IHA group 2 is  Timing of annual extreme water conditions,
+####### IHA group 3 is  Timing of annual extreme water conditions,
 #Julian date of each annual 1-day maximum and 1-day minimum 
 
 
@@ -618,14 +621,34 @@ bh.gull_list_gr.3 <- lapply(RCH_split,function(x)
 
 ##############################################################################################
 ####### GROUP 4 ################################################################################
-####### IHA group 2 is  Frequency and duration of high and low pulses
+####### IHA group 4 is  Frequency and duration of high and low pulses
 # Number of low pulses within each water year, Mean or median duration of low pulses (days),
 # Number of high pulses within each water year, Mean or median duration of high pulses (days)
 
+test <- lapply(RCH_split,function(x) 
+  ddply(x,.(RCH, Year), summarize,
+        Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for each year
+        Q3=quantile(FLOW_OUTcms, 0.75),#find the 75% quartile for each year
+        #count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
+        test=length[FLOW_OUTcms > quantile(FLOW_OUTcms, 0.75), ]
+                  ))
 
+df[ df$Val > quantile(df$Val , 0.25 ) , ]
 
+test_fun <- function ( x) { # x to all, y to bhg
+  Q1= quantile(x$FLOW_OUTcms, 0.25)#find the 25% quartile for each year
+  Q3= quantile(x$FLOW_OUTcms, 0.75)#find the 75% quartile for each year
+  #overQ1=sum(y$FLOW_OUTcms > Q1)
+  res= cbind(Q1, Q3)
+  return(res)
+}
 
+test <- test_fun(RCH_split) 
 
+bh.gull_Q_mod <- Q_mod_Wisla[Q_mod_Wisla$date %in% bh.gull_dat, ] 
+
+RCH_split_bh.gull
+sum(RCH_split_bh.gull$FLOW_OUTcms > Q3)
 
 ######################################################################
 ######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
