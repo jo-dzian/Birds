@@ -625,30 +625,36 @@ bh.gull_list_gr.3 <- lapply(RCH_split,function(x)
 # Number of low pulses within each water year, Mean or median duration of low pulses (days),
 # Number of high pulses within each water year, Mean or median duration of high pulses (days)
 
-test <- lapply(RCH_split,function(x) 
+RCH_split_q13 <- lapply(RCH_split,function(x) 
   ddply(x,.(RCH, Year), summarize,
         Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for each year
-        Q3=quantile(FLOW_OUTcms, 0.75),#find the 75% quartile for each year
-        #count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
-        test=length[FLOW_OUTcms > quantile(FLOW_OUTcms, 0.75), ]
-                  ))
+        Q3=quantile(FLOW_OUTcms, 0.75)))#find the 75% quartile for each year
 
-df[ df$Val > quantile(df$Val , 0.25 ) , ]
+# reorganize list so it matches the structure of the other datasets        
+bh.gull_Q_mod_list_RCH <- bh.gull_Q_mod %>% group_split(bh.gull_Q_mod$RCH) %>% setNames(RCH_names)
 
-test_fun <- function ( x) { # x to all, y to bhg
-  Q1= quantile(x$FLOW_OUTcms, 0.25)#find the 25% quartile for each year
-  Q3= quantile(x$FLOW_OUTcms, 0.75)#find the 75% quartile for each year
-  #overQ1=sum(y$FLOW_OUTcms > Q1)
-  res= cbind(Q1, Q3)
-  return(res)
-}
+#count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
+# I need to use the bh.gull_Q_mod_list_RCH
 
-test <- test_fun(RCH_split) 
+RCH_split_q13_period <- lapply(RCH_split,function(x) 
+  ddply(x,.(RCH), summarize,
+        P0.1=quantile(FLOW_OUTcms, 0.1),#find the 10% percentile for 15 year period
+        Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for 15 year period
+        Q3=quantile(FLOW_OUTcms, 0.75),#find the 75% quartile for 15 year period
+        P0.9=quantile(FLOW_OUTcms, 0.9)#find the 90% percentile for 15 year period
+        ))
 
-bh.gull_Q_mod <- Q_mod_Wisla[Q_mod_Wisla$date %in% bh.gull_dat, ] 
+library(dplyr)
+library(purrr)
 
-RCH_split_bh.gull
-sum(RCH_split_bh.gull$FLOW_OUTcms > Q3)
+test <- Map(function(x, y) aggregate(FLOW_OUTcms > Q3~Year, 
+                                     merge(x, y, all = TRUE,
+            na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
+            aggregate(FLOW_OUTcms > Q1~Year, 
+                      merge(x, y, all = TRUE,
+                            na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'),
+            bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
+
 
 ######################################################################
 ######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
@@ -661,3 +667,7 @@ sum(RCH_split_bh.gull$FLOW_OUTcms > Q3)
 
 #### ???? I'm not sure if I asigned x and y correctly
 
+test1 <- lapply(cor.test(bh.gull_list_gr.2$day01_min, bh_gull_NS_list$NS))
+
+do.call(cbind, Map(function(x, y) sapply(1:7, function(z) cor(x[z:(z+3)], y[z:(z+1)])), 
+                   bh.gull_list_gr.2, bh_gull_NS_list))
