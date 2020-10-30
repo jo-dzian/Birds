@@ -625,35 +625,27 @@ bh.gull_list_gr.3 <- lapply(RCH_split,function(x)
 # Number of low pulses within each water year, Mean or median duration of low pulses (days),
 # Number of high pulses within each water year, Mean or median duration of high pulses (days)
 
-RCH_split_q13 <- lapply(RCH_split,function(x) 
-  ddply(x,.(RCH, Year), summarize,
-        Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for each year
-        Q3=quantile(FLOW_OUTcms, 0.75)))#find the 75% quartile for each year
+# calculate percentiles and quartiles for the 15 year period
+RCH_split_q13_period <- lapply(RCH_split,function(x) 
+  ddply(x,.(RCH), summarize,
+        P0.05=quantile(FLOW_OUTcms, 0.05),#find the 10% percentile for 15 year period
+        Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for 15 year period
+        Q3=quantile(FLOW_OUTcms, 0.75),#find the 75% quartile for 15 year period
+        P0.95=quantile(FLOW_OUTcms, 0.95)#find the 90% percentile for 15 year period
+        ))
 
 # reorganize list so it matches the structure of the other datasets        
 bh.gull_Q_mod_list_RCH <- bh.gull_Q_mod %>% group_split(bh.gull_Q_mod$RCH) %>% setNames(RCH_names)
 
 #count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
 # I need to use the bh.gull_Q_mod_list_RCH
-
-RCH_split_q13_period <- lapply(RCH_split,function(x) 
-  ddply(x,.(RCH), summarize,
-        P0.1=quantile(FLOW_OUTcms, 0.1),#find the 10% percentile for 15 year period
-        Q1=quantile(FLOW_OUTcms, 0.25),#find the 25% quartile for 15 year period
-        Q3=quantile(FLOW_OUTcms, 0.75),#find the 75% quartile for 15 year period
-        P0.9=quantile(FLOW_OUTcms, 0.9)#find the 90% percentile for 15 year period
-        ))
-
-library(dplyr)
-library(purrr)
-
-test <- Map(function(x, y) aggregate(FLOW_OUTcms > Q3~Year, 
-                                     merge(x, y, all = TRUE,
-            na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
-            aggregate(FLOW_OUTcms > Q1~Year, 
-                      merge(x, y, all = TRUE,
-                            na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'),
+test1 <- Map(function(x, y) aggregate(FLOW_OUTcms > cbind(Q3, P0.95)~Year, merge(x, y, all = TRUE,
+                            na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
             bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
+
+test2 <- Map(function(x, y) aggregate(FLOW_OUTcms < cbind(P0.05, Q1)~Year, merge(x, y, all = TRUE,
+                             na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
+             bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
 
 
 ######################################################################
