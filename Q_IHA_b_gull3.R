@@ -650,7 +650,7 @@ bh.gull.gr4_part2 <- Map(function(x, y) aggregate(FLOW_OUTcms < cbind(P0.05, Q1)
 # cbind the two parts
 bh.gull_gr4_parts <- Map(cbind, bh.gull.gr4_part1, bh.gull.gr4_part2) 
 # remove Year appearing twice  
-bh.gull_list_gr4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
+bh.gull_list_gr.4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
 
 #calculate % of time above Q3 etc.
 
@@ -665,7 +665,79 @@ bh.gull_list_gr4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
 
 #### ???? I'm not sure if I asigned x and y correctly
 
-test1 <- lapply(cor.test(bh.gull_list_gr.2$day01_min, bh_gull_NS_list$NS))
+#combine all 4 groups of indicators with NS
 
-do.call(cbind, Map(function(x, y) sapply(1:7, function(z) cor(x[z:(z+3)], y[z:(z+1)])), 
-                   bh.gull_list_gr.2, bh_gull_NS_list))
+bh.gull_list_parts <- Map(cbind,  bh.gull_list_gr.2, bh.gull_list_gr.1, bh.gull_list_gr.3, bh.gull_list_gr.4,
+                          bh_gull_NS_list) 
+
+# remove columns appearing twice or no longer needed
+bh.gull_list_gr.all_NS <-  lapply(bh.gull_list_parts , "[", -c(12:17,20,27))
+
+test1 <- lapply(cor.test(bh.gull_list_gr.2, bh_gull_NS_list))
+
+test1 <-lapply(2:5, function(i)  mapply(function(x, y) {
+  a <- cor.test(x, y, method = "spearman")
+  c(setNames(a$p.value, "pvalue"), a$estimate)
+}, lapply(bh.gull_list_gr.4, "[[", i), bh_gull_NS_list[i]))
+
+
+test1 <- Map(function(x, y) cor.test(x, y, method = "spearman"),
+                bh.gull_list_gr.4, bh_gull_NS_list)
+
+
+test1 <- Map(cor.test(bh.gull_list_gr.4$`910`, bh_gull_NS_list$`910`))
+
+test1 <- cor.test(bh.gull_list_gr.4$`910`$Q3, bh_gull_NS_list$`910`$NS$X21, method = "spearman")
+
+test1 <- cor.test(bh.gull_list_gr.4$Q3, bh_gull_NS_list$X21, method = "spearman")
+
+test1 <- sapply( function(i){
+                         cor(bh.gull_list_gr.4[1:i],bh_gull_NS_list[1:i])
+                       })
+
+library(reshape2)
+sub.A1.wide <- dcast(bh.gull_list_gr.all_NS, "Year" ~ "Q3", mean)
+dcast(mgoals, Venue + Game ~ variable, sum)
+
+test1 <- for (i in 1:length(bh.gull_list_gr.all_NS)) {
+  cor.test(i["NS"], i["Q3"])     
+}
+min_max <- function (x){
+  dat <- data.frame(y = mean(x),
+                    ymin = min(x),
+                    ymax = max(x))
+  return(dat)
+}
+
+
+test_q3 <- function (x){
+  dat <- data.frame(y = mean(x),
+                    ymin = min(x),
+                    ymax = max(x))
+  return(dat)
+}
+
+
+test1 <- unlist(bh.gull_list_gr.all_NS, recursive = FALSE)
+test1 <- rbind(bh.gull_list_gr.all_NS)
+
+library(data.table)
+test1 <- rbindlist(bh.gull_list_gr.all_NS,  fill=TRUE)
+
+test2 <- cor(test1$NS, test1$Q3, method = c("pearson"), use="complete.obs")
+test3 <- cor(test1$NS, test1$day07_max, method = c("pearson"), use="complete.obs")
+
+test3 <- cor(test1, method = c("pearson"), use="pairwise.complete.obs")
+
+test_merge <- merge (test2, test3)
+library(corrplot)
+
+corrplot(test_merge)
+
+library("ggpubr")
+ggscatter(test1, x = "Q3", y = "NS", use="complete.obs", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Q3", ylab = "NS")
+
+
