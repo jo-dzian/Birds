@@ -639,14 +639,20 @@ bh.gull_Q_mod_list_RCH <- bh.gull_Q_mod %>% group_split(bh.gull_Q_mod$RCH) %>% s
 
 #count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
 # I need to use the bh.gull_Q_mod_list_RCH
-test1 <- Map(function(x, y) aggregate(FLOW_OUTcms > cbind(Q3, P0.95)~Year, merge(x, y, all = TRUE,
+bh.gull.gr4_part1 <- Map(function(x, y) aggregate(FLOW_OUTcms > cbind(Q3, P0.95)~Year, merge(x, y, all = TRUE,
                             na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
             bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
 
-test2 <- Map(function(x, y) aggregate(FLOW_OUTcms < cbind(P0.05, Q1)~Year, merge(x, y, all = TRUE,
+bh.gull.gr4_part2 <- Map(function(x, y) aggregate(FLOW_OUTcms < cbind(P0.05, Q1)~Year, merge(x, y, all = TRUE,
                              na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
              bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
 
+# cbind the two parts
+bh.gull_gr4_parts <- Map(cbind, bh.gull.gr4_part1, bh.gull.gr4_part2) 
+# remove Year appearing twice  
+bh.gull_list_gr4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
+
+#calculate % of time above Q3 etc.
 
 ######################################################################
 ######## ??? how to draw regression plots between IHA values and Nesting success for all locations together on single plot
