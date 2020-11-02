@@ -673,71 +673,112 @@ bh.gull_list_parts <- Map(cbind,  bh.gull_list_gr.2, bh.gull_list_gr.1, bh.gull_
 # remove columns appearing twice or no longer needed
 bh.gull_list_gr.all_NS <-  lapply(bh.gull_list_parts , "[", -c(12:17,20,27))
 
-test1 <- lapply(cor.test(bh.gull_list_gr.2, bh_gull_NS_list))
-
-test1 <-lapply(2:5, function(i)  mapply(function(x, y) {
-  a <- cor.test(x, y, method = "spearman")
-  c(setNames(a$p.value, "pvalue"), a$estimate)
-}, lapply(bh.gull_list_gr.4, "[[", i), bh_gull_NS_list[i]))
-
-
-test1 <- Map(function(x, y) cor.test(x, y, method = "spearman"),
-                bh.gull_list_gr.4, bh_gull_NS_list)
-
-
-test1 <- Map(cor.test(bh.gull_list_gr.4$`910`, bh_gull_NS_list$`910`))
-
-test1 <- cor.test(bh.gull_list_gr.4$`910`$Q3, bh_gull_NS_list$`910`$NS$X21, method = "spearman")
-
-test1 <- cor.test(bh.gull_list_gr.4$Q3, bh_gull_NS_list$X21, method = "spearman")
-
-test1 <- sapply( function(i){
-                         cor(bh.gull_list_gr.4[1:i],bh_gull_NS_list[1:i])
-                       })
-
-library(reshape2)
-sub.A1.wide <- dcast(bh.gull_list_gr.all_NS, "Year" ~ "Q3", mean)
-dcast(mgoals, Venue + Game ~ variable, sum)
-
-test1 <- for (i in 1:length(bh.gull_list_gr.all_NS)) {
-  cor.test(i["NS"], i["Q3"])     
-}
-min_max <- function (x){
-  dat <- data.frame(y = mean(x),
-                    ymin = min(x),
-                    ymax = max(x))
-  return(dat)
-}
-
-
-test_q3 <- function (x){
-  dat <- data.frame(y = mean(x),
-                    ymin = min(x),
-                    ymax = max(x))
-  return(dat)
-}
-
-
-test1 <- unlist(bh.gull_list_gr.all_NS, recursive = FALSE)
-test1 <- rbind(bh.gull_list_gr.all_NS)
-
 library(data.table)
-test1 <- rbindlist(bh.gull_list_gr.all_NS,  fill=TRUE)
+bh.gull_iha_foredit <- rbindlist(bh.gull_list_gr.all_NS,  fill=TRUE)
 
-test2 <- cor(test1$NS, test1$Q3, method = c("pearson"), use="complete.obs")
-test3 <- cor(test1$NS, test1$day07_max, method = c("pearson"), use="complete.obs")
-
-test3 <- cor(test1, method = c("pearson"), use="pairwise.complete.obs")
-
-test_merge <- merge (test2, test3)
-library(corrplot)
-
-corrplot(test_merge)
+#export in order to combine several NS columns into one manually
+write.csv(bh.gull_iha_foredit, "bh.gull_iha_foredit.csv")
+#import edited file
+bh.gull_iha_edit <-read.csv("bh.gull_iha_edit.csv")
 
 library("ggpubr")
-ggscatter(test1, x = "Q3", y = "NS", use="complete.obs", 
+# GROUP 1
+bh.gull_graph_mean_LE <- ggscatter(bh.gull_iha_edit, x = "gr.1.mean.LE", y = "NS", use="complete.obs", 
+                              add = "reg.line", conf.int = TRUE, 
+                              cor.coef = TRUE, cor.method = "pearson",
+                              xlab = "gr.1 mean LE", ylab = "NS")
+  print(bh.gull_graph_mean_LE)
+
+bh.gull_graph_mean_Incub <- ggscatter(bh.gull_iha_edit, x = "gr.1.mean.Incub", y = "NS", use="complete.obs", 
+                           add = "reg.line", conf.int = TRUE, 
+                           cor.coef = TRUE, cor.method = "pearson",
+                           xlab = "gr.1 mean Incub", ylab = "NS")
+  print(bh.gull_graph_mean_Incub)
+
+bh.gull_graph_mean_RC <- ggscatter(bh.gull_iha_edit, x = "gr.1.mean.RC", y = "NS", use="complete.obs", 
+                          add = "reg.line", conf.int = TRUE, 
+                          cor.coef = TRUE, cor.method = "pearson",
+                          xlab = "gr.1 mean RC", ylab = "NS")
+  print(bh.gull_graph_mean_RC)
+
+# GROUP 2
+
+bh.gull_graph_day01_min <- ggscatter(bh.gull_iha_edit, x = "day01_min", y = "NS", use="complete.obs", 
+                             add = "reg.line", conf.int = TRUE, 
+                             cor.coef = TRUE, cor.method = "pearson",
+                             xlab = "gr.2 one day min", ylab = "NS")
+  print(bh.gull_graph_day01_min) 
+
+bh.gull_graph_day01_max <- ggscatter(bh.gull_iha_edit, x = "day01_max", y = "NS", use="complete.obs", 
+                               add = "reg.line", conf.int = TRUE, 
+                               cor.coef = TRUE, cor.method = "pearson",
+                               xlab = "gr.2 one day max", ylab = "NS")
+  print(bh.gull_graph_day01_max) 
+  
+bh.gull_graph_day03_min <- ggscatter(bh.gull_iha_edit, x = "day03_min", y = "NS", use="complete.obs", 
+                               add = "reg.line", conf.int = TRUE, 
+                               cor.coef = TRUE, cor.method = "pearson",
+                               xlab = "gr.2 three day min", ylab = "NS")
+  print(bh.gull_graph_day03_min) 
+  
+bh.gull_graph_day03_max <- ggscatter(bh.gull_iha_edit, x = "day03_max", y = "NS", use="complete.obs", 
+                               add = "reg.line", conf.int = TRUE, 
+                               cor.coef = TRUE, cor.method = "pearson",
+                               xlab = "gr.2 three day max", ylab = "NS")
+  print(bh.gull_graph_day03_max)
+  
+bh.gull_graph_day07_min <- ggscatter(bh.gull_iha_edit, x = "day07_min", y = "NS", use="complete.obs", 
+                               add = "reg.line", conf.int = TRUE, 
+                               cor.coef = TRUE, cor.method = "pearson",
+                               xlab = "gr.2 seven day min", ylab = "NS")
+  print(bh.gull_graph_day07_min) 
+  
+bh.gull_graph_day07_max <- ggscatter(bh.gull_iha_edit, x = "day07_max", y = "NS", use="complete.obs", 
+                               add = "reg.line", conf.int = TRUE, 
+                               cor.coef = TRUE, cor.method = "pearson",
+                               xlab = "gr.2 seven day max", ylab = "NS")
+  print(bh.gull_graph_day07_max) 
+  
+# GROUP 3
+bh.gull_graph_vp_max <- ggscatter(bh.gull_iha_edit, x = "vp_max", y = "NS", use="complete.obs", 
+                      add = "reg.line", conf.int = TRUE, 
+                      cor.coef = TRUE, cor.method = "pearson",
+                      xlab = "gr.3 max within vp", ylab = "NS")
+  print(bh.gull_graph_vp_max)
+
+# GROUP 4
+  
+bh.gull_graph_Q3 <- ggscatter(bh.gull_iha_edit, x = "Q3", y = "NS", use="complete.obs", 
           add = "reg.line", conf.int = TRUE, 
           cor.coef = TRUE, cor.method = "pearson",
-          xlab = "Q3", ylab = "NS")
+          xlab = "gr.4 days above 0.75", ylab = "NS")
+  print(bh.gull_graph_Q3)
 
+bh.gull_graph_P0.95 <- ggscatter(bh.gull_iha_edit, x = "P0.95", y = "NS", use="complete.obs", 
+                      add = "reg.line", conf.int = TRUE, 
+                      cor.coef = TRUE, cor.method = "pearson",
+                      xlab = "gr.4 days above 0.95", ylab = "NS")
+  print(bh.gull_graph_P0.95)
 
+bh.gull_graph_Q1 <- ggscatter(bh.gull_iha_edit, x = "Q1", y = "NS", use="complete.obs", 
+                      add = "reg.line", conf.int = TRUE, 
+                      cor.coef = TRUE, cor.method = "pearson",
+                      xlab = "gr.4 days below 0.25", ylab = "NS")
+  print(bh.gull_graph_Q1)
+
+# Gather the Graphs
+  library(gridExtra)
+  library(grid)
+  library(ggplot2)
+  library(lattice)
+  
+bh.gull_cor_graph <- grid.arrange(
+                bh.gull_graph_mean_LE, bh.gull_graph_mean_Incub, bh.gull_graph_mean_RC,
+                bh.gull_graph_day01_min, bh.gull_graph_day01_max, 
+                bh.gull_graph_day03_min, bh.gull_graph_day03_max, 
+                bh.gull_graph_day07_min, bh.gull_graph_day07_max,
+                bh.gull_graph_vp_max,
+                bh.gull_graph_Q3, bh.gull_graph_P0.95, bh.gull_graph_Q1,
+                ncol=3)
+
+print(bh.gull_cor_graph)
