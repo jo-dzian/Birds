@@ -799,22 +799,90 @@ bh.gull_list_all <- lapply(bh.gull_list_all_in, "[", c(5, 1:3, 6:11, 18:19, 21:2
 
 #********
 #calculate means for each IHA (without spliting into RCH or years) for the baseline period
-bh.gull_list_all_mean <- bh.gull_list_all %>% 
-  reduce(bind_rows) %>% 
-  summarise_all(mean) %>%
-  select(-Year)
+#1st option
+#bh.gull_list_all_mean <- bh.gull_list_all %>% 
+#  reduce(bind_rows) %>% 
+#  summarise_all(mean) %>%
+#  select(-Year)
+
+#2nd option
+library(plyr)
+library(dplyr)
+
+# bind list to a tibble and make list names to a column
+bh.gull_list_all_df <- plyr::ldply(bh.gull_list_all, data.frame) %>% 
+  dplyr::rename(RCH = 1)
+
+# mean
+bh.gull_list_all_mean <- bh.gull_list_all_df %>% 
+  dplyr::summarise(gr.1_mean_LE = mean(gr.1_mean_LE),
+                   gr.1_mean_Incub = mean(gr.1_mean_Incub),
+                   gr.1_mean_RC = mean(gr.1_mean_RC),
+                   gr.2_day01_min = mean(day01_min),
+                   gr.2_day01_max = mean(day01_max),
+                   gr.2_day03_min = mean(day03_min),
+                   gr.2_day03_max = mean(day03_max),
+                   gr.2_day07_min = mean(day07_min),
+                   gr.2_day07_max = mean(day07_max),
+                   gr.3_vp_min = mean(vp_min),
+                   gr.3_vp_max = mean(vp_max),
+                   gr.4_P0.95 = mean(P0.95),
+                   gr.4_Q3 = mean(Q3),
+                   gr.4_Q1 = mean(Q1),
+                   gr.4_P0.05 = mean(P0.05))
+
+
+write.csv(bh.gull_list_all_mean, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_list_all_mean.csv")
 
 #********
 #calculate means for each IHA (with spliting into RCH but without spliting into years) 
 # for the baseline period
 
+# RCH mean
+bh.gull_list_rch_mean <- bh.gull_list_all_df %>%  
+  dplyr::group_by(RCH) %>% 
+  dplyr::summarise(gr.1_mean_LE = mean(gr.1_mean_LE),
+                   gr.1_mean_Incub = mean(gr.1_mean_Incub),
+                   gr.1_mean_RC = mean(gr.1_mean_RC),
+                   gr.2_day01_min = mean(day01_min),
+                   gr.2_day01_max = mean(day01_max),
+                   gr.2_day03_min = mean(day03_min),
+                   gr.2_day03_max = mean(day03_max),
+                   gr.2_day07_min = mean(day07_min),
+                   gr.2_day07_max = mean(day07_max),
+                   gr.3_vp_min = mean(vp_min),
+                   gr.3_vp_max = mean(vp_max),
+                   gr.4_P0.95 = mean(P0.95),
+                   gr.4_Q3 = mean(Q3),
+                   gr.4_Q1 = mean(Q1),
+                   gr.4_P0.05 = mean(P0.05))
+
+
+write.csv(bh.gull_list_rch_mean, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_list_rch_mean.csv")
+
+
 #********
 #calculate means for each IHA (with spliting into Years but without spliting into RCH) 
 # for the baseline period
 
-# for list
-test <- lapply(bh.gull_list_all, function(x) {
-  aggregate(x$gr.1_mean_LE, list(x$Year), mean) })
 
-#to check results
-test1 <- data.frame(rowMeans(do.call(cbind, lapply(bh.gull_list_all, "[", "day07_min"))))
+# year mean
+bh.gull_list_year_mean<- bh.gull_list_all_df %>% 
+  dplyr::group_by(Year) %>% 
+  dplyr::summarise(gr.1_mean_LE = mean(gr.1_mean_LE),
+                   gr.1_mean_Incub = mean(gr.1_mean_Incub),
+                   gr.1_mean_RC = mean(gr.1_mean_RC),
+                   gr.2_day01_min = mean(day01_min),
+                   gr.2_day01_max = mean(day01_max),
+                   gr.2_day03_min = mean(day03_min),
+                   gr.2_day03_max = mean(day03_max),
+                   gr.2_day07_min = mean(day07_min),
+                   gr.2_day07_max = mean(day07_max),
+                   gr.3_vp_min = mean(vp_min),
+                   gr.3_vp_max = mean(vp_max),
+                   gr.4_P0.95 = mean(P0.95),
+                   gr.4_Q3 = mean(Q3),
+                   gr.4_Q1 = mean(Q1),
+                   gr.4_P0.05 = mean(P0.05))
+
+write.csv(bh.gull_list_year_mean, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_list_year_mean.csv")
