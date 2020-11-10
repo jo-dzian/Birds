@@ -10,39 +10,8 @@ subbasins_nr <- data.frame(rbind("910","950", "1012", "1087", "1134","1240","126
 "1565","1601","1629", "1727","1746","1875"))
 colnames(subbasins_nr)<- c("RCH")
 
-# 4.5 NF
-
-mydir_45_NF = "D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF"
-myfiles_45_NF = list.files(path=mydir_45_NF, pattern="*.csv", full.names=TRUE)
-gc() # free up memory
-dat_csv_45_NF = ldply(myfiles_45_NF, read_csv)
-dat_csv_45_NF <- list.files(path=mydir_45_NF, full.names = TRUE) %>% 
-  lapply(read_csv) %>% 
-  bind_cols
-
-
-test <- for (i in myfiles_45_NF[-1]) {
-  into <- read.csv(i, header = TRUE, sep = ",")[, c("subbasin" ,"date", "flow")]
-  out <-  subset(into, "subbasin" == subbasins_nr )
-  #out2 <- 
-  print(out)
-  #colnames(out) <- c("date", basename(myfiles_45_NF[i]))
-  #result <- merge(out, by = "date")
-}
-
-
-test <- for (i in myfiles_45_NF) {
-  in_data <- read.csv(i, header = TRUE, sep = ",")[, c("subbasin" ,"date", "flow")]
-  in_data2 <- in_data[ in_data$subbasin %in% subbasins_nr$RCH, ]
-  in_data2$date2 <- as.POSIXct(in_data2$date, format="%Y-%m-%d")
-  month <- as.integer(format(in_data2$date2, '%m'))
-  day <- as.integer(format(in_data2$date2, '%d'))
-  in_data3 <- filter(in_data2, month == 4 & day >= 11 | month == 5 | month == 6 & day <= 10)
-  in_data4 <- split(in_data3, in_data3$subbasin)
-  write.csv(in_data4, "D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/VP_bh.gull")
-}
-
-test_fun <- function(x){
+# extract vulnerability period for bh.gull
+fun_bh.gull_vp <- function(x){
   in_data <- read.csv(x, header = TRUE, sep = ",")
   in_data2 <- in_data[ in_data$subbasin %in% subbasins_nr$RCH, ]
   in_data2$date2 <- as.POSIXct(in_data2$date, format="%Y-%m-%d")
@@ -50,26 +19,26 @@ test_fun <- function(x){
   day <- as.integer(format(in_data2$date2, '%d'))
   in_data3 <- filter(in_data2, month == 4 & day >= 11 | month == 5 | month == 6 & day <= 10)
   in_data4 <- split(in_data3, in_data3$subbasin)
-  }
+}
+
+bh.gull_vp_2024_2050_4.5_cm1 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
 
 
-test <- test_fun("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
 
-test1 <- read.csv("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv",
-                  header = TRUE, sep = ",")
-#why in channels for callinbration are 23 not 18 subbasins?
-test2 <- test1[ test1$subbasin %in% channels_for_calibration$Subbasin, ]
+# 4.5 NF
 
-test2 <- test1[ test1$subbasin %in% subbasins_nr$RCH, ]
+fun_2024_2050_allyear <- function(x){
+  in_data <- read.csv(x, header = TRUE, sep = ",")
+  in_data2 <- in_data[ in_data$subbasin %in% subbasins_nr$RCH, ]
+  in_data3 <- split(in_data2, in_data2$subbasin)
+}
 
-#test2 <- as.Date(test2$date, format="%Y-%m-%d")
-test2$date2 <- as.POSIXct(test2$date, format="%Y-%m-%d")
+future_2024_2050_4.5_cm1 <- fun_2024_2050_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
 
-month <- as.integer(format(test2$date2, '%m'))
-day <- as.integer(format(test2$date2, '%d'))
-result <- filter(test2, month == 4 & day >= 11 | month == 5 | month == 6 & day <= 10)
-result2 <- split(result, result$subbasin)
-
+#calculate means for each IHA (without spliting into RCH or years)
+test <- bh.gull_list_gr.1 %>% 
+  reduce(bind_rows) %>% 
+  summarise_all(mean)
 
 # 4.5 FF
 

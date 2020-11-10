@@ -467,11 +467,12 @@ bh.gull_interv_le_list <- lapply(RCH_split_bh.gull, function(x) {
 bh.gull_le_gr.1_list <- lapply(bh.gull_interv_le_list, function(x) {
   aggregate(x$FLOW_OUTcms, list(x$Year), mean) %>%
   remove_rownames %>% 
-  column_to_rownames(var="Group.1")})
+  column_to_rownames(var="Group.1")
+  })
 
 ##change names of columns
 # unlisted
-#names(bh.gull_le_gr.1)[names(bh.gull_le_gr.1) == 'x'] <- 'gr.1 mean LE'
+#names(bh.gull_le_gr.1)[names(bh.gull_le_gr.1) == 'x'] <- 'gr.1_mean_LE'
 
 ######### incubating 20.04 - 31.05 ###################################
 bh.gull_interv_i1 <- as.interval(ddays(41), start = ISOdate(2004:2018, 4, 21, 0, tz = 'Europe/Warsaw'))
@@ -535,7 +536,7 @@ bh.gull_rc_gr.1_list <- lapply(bh.gull_interv_rc_list, function(x) {
 bh.gull_list_gr.1 <- mapply(cbind, bh.gull_le_gr.1_list,bh.gull_i_gr.1_list, bh.gull_rc_gr.1_list, SIMPLIFY=FALSE)
 
 ##change names of columns in the list
-colnames.gr1 = c("gr.1 mean LE","gr.1 mean Incub", "gr.1 mean RC") 
+colnames.gr1 = c("gr.1_mean_LE","gr.1_mean_Incub", "gr.1_mean_RC") 
 bh.gull_list_gr.1 <- lapply(bh.gull_list_gr.1, setNames, colnames.gr1)
 
 
@@ -784,3 +785,36 @@ bh.gull_cor_graph <- grid.arrange(
                 ncol=3)
 
 print(bh.gull_cor_graph)
+
+#####******#####******#####******#####
+##### SUMMARIZING IHA INDICATORS
+#####******#####******#####******#####
+
+#putting all the indicators in one list
+bh.gull_list_all_in <- mapply(cbind, bh.gull_list_gr.1, bh.gull_list_gr.2, bh.gull_list_gr.3, bh.gull_list_gr.4
+                              , SIMPLIFY=FALSE)
+
+# leave only the columns with IHA
+bh.gull_list_all <- lapply(bh.gull_list_all_in, "[", c(5, 1:3, 6:11, 18:19, 21:24))
+
+#********
+#calculate means for each IHA (without spliting into RCH or years) for the baseline period
+bh.gull_list_all_mean <- bh.gull_list_all %>% 
+  reduce(bind_rows) %>% 
+  summarise_all(mean) %>%
+  select(-Year)
+
+#********
+#calculate means for each IHA (with spliting into RCH but without spliting into years) 
+# for the baseline period
+
+#********
+#calculate means for each IHA (with spliting into Years but without spliting into RCH) 
+# for the baseline period
+
+# for list
+test <- lapply(bh.gull_list_all, function(x) {
+  aggregate(x$gr.1_mean_LE, list(x$Year), mean) })
+
+#to check results
+test1 <- data.frame(rowMeans(do.call(cbind, lapply(bh.gull_list_all, "[", "day07_min"))))
