@@ -100,6 +100,34 @@ bh.gull_nf_4.5_rear_gr.1_list  <- lapply( bh.gull_vp_4.5_NF_list, lapply, fun_bh
 # (Annual maxima, 1-day mean) 
 # 1,3,7 day max
 
+library("zoo")
+
+#calculating rolling 1,3 an 7 day mean on list
+
+fun_bh.gull_data_roll_list <- function(x){
+  step1 <- dplyr::mutate(x, day01_mean = zoo::rollmean (x$flow, k = 1, fill = NA), #we have 1 measurment per day so this is acctually not necessary to calculate
+                         day03_mean = zoo::rollmean (x$flow, k = 3, fill = NA),
+                         day07_mean = zoo::rollmean (x$flow, k = 7, fill = NA))
+step1$Year <- format(as.Date(step1$date, format="%Y-%m-%d"),"%Y")
+step1$date2 <- as.POSIXct(step1$date, format="%Y-%m-%d")
+month <- as.integer(format(step1$date2, '%m'))
+day <- as.integer(format(step1$date2, '%d'))
+in_data3 <- filter(step1, month == 4 & day >= 11 | month == 5 | month == 6 & day <= 10)}
+
+#apply to list
+data_4.5_NF_roll_list  <- lapply( data_4.5_NF, lapply, fun_bh.gull_data_roll_list)
+
+# calculate the minimum and maximum per year per RCH
+
+library(plyr)
+fun_data_roll_list_max <- function(x) { 
+  ddply(x,.(subbasin,Year), summarize,
+         day01_max=max(day01_mean),
+         day03_max=max(day03_mean),
+         day07_max=max(day07_mean) 
+  )}
+
+data_4.5_NF_roll_list_max  <- lapply( data_4.5_NF_roll_list, lapply, fun_data_roll_list_max)
 
 ##############################################################################################
 ####### GROUP 3 ################################################################################
