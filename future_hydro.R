@@ -17,17 +17,22 @@ fun_sub_allyear <- function(x){
   in_data3 <- split(in_data2, in_data2$subbasin)
 }
 
-#single dataframe
-future_2024_2050_4.5_cm1 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
-
-# get a list of files
-input_files_4.5_NF <- list.files("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF", pattern = "[.]csv", full.names = TRUE)
-input_files_4.5_FF <- list.files("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_FF", pattern = "[.]csv", full.names = TRUE)
-input_files_8.5_NF <- list.files("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/8.5_NF", pattern = "[.]csv", full.names = TRUE)
-input_files_8.5_FF <- list.files("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/8.5_FF", pattern = "[.]csv", full.names = TRUE)
-
+#clear memory as this process needs a lot of it
+gc()
 # extract data for subbasins of interest
-data_4.5_NF <- lapply(input_files_4.5_NF, fun_sub_allyear)
+nf_2024_2050_4.5_cm1 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm2 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm02_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm3 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm03_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm4 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm04_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm5 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm05_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm6 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm06_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm7 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm07_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm8 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm08_2024_2050_reach.csv")
+nf_2024_2050_4.5_cm9 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm09_2024_2050_reach.csv")
+
+data_4.5_NF <- list(nf_2024_2050_4.5_cm1, nf_2024_2050_4.5_cm2, nf_2024_2050_4.5_cm3,
+                    nf_2024_2050_4.5_cm4, nf_2024_2050_4.5_cm5, nf_2024_2050_4.5_cm6,
+                    nf_2024_2050_4.5_cm7, nf_2024_2050_4.5_cm8, nf_2024_2050_4.5_cm9)
 
 # extract data for vulnerability period for bh.gull for subbasins of interest
 
@@ -40,10 +45,23 @@ fun_bh.gull_vp <- function(x){
   in_data3 <- filter(in_data2, month == 4 & day >= 11 | month == 5 | month == 6 & day <= 10)
   in_data4 <- split(in_data3, in_data3$subbasin)
 }
+gc()
 
 bh.gull_vp_2024_2050_4.5_cm1 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm01_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm2 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm02_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm3 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm03_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm4 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm04_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm5 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm05_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm6 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm06_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm7 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm07_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm8 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm08_2024_2050_reach.csv")
+bh.gull_vp_2024_2050_4.5_cm9 <- fun_bh.gull_vp("D:/Ptaki_hydro/Obliczenia/4TU/future_csv/4.5_NF/rcp45_cm09_2024_2050_reach.csv")
 
-bh.gull_vp_4.5_NF <- lapply(input_files_4.5_NF, fun_bh.gull_vp)
+bh.gull_vp_4.5_NF_list <- list (bh.gull_vp_2024_2050_4.5_cm1, bh.gull_vp_2024_2050_4.5_cm2,
+                           bh.gull_vp_2024_2050_4.5_cm3, bh.gull_vp_2024_2050_4.5_cm4,
+                           bh.gull_vp_2024_2050_4.5_cm5, bh.gull_vp_2024_2050_4.5_cm6,
+                           bh.gull_vp_2024_2050_4.5_cm7, bh.gull_vp_2024_2050_4.5_cm8,
+                           bh.gull_vp_2024_2050_4.5_cm9)
 
 ####### GROUP 1 ################################################################################
 ####### IHA group 1 Mean or median value for each calendar month replaced with means for periods of
@@ -52,7 +70,29 @@ bh.gull_vp_4.5_NF <- lapply(input_files_4.5_NF, fun_bh.gull_vp)
 
 ######### incubating 20.04 - 31.05 ###################################
 
+# narrow down the period to incubation and calculate mean
+fun_bh.gull_vp_incub <- function(x){
+  month <- as.integer(format(x$date2, '%m'))
+  day <- as.integer(format(x$date2, '%d'))
+  in_data1 <- filter(x, month == 4 & day >= 11 | month == 5 & day <= 31) #select incubation period
+  in_data2 <- aggregate(in_data1$flow, list(in_data1$subbasin), mean) #calculate mean for that period
+  setNames(in_data2, c("subbasin", "mean_incub")) #rename columns
+      }
+
+bh.gull_nf_4.5_incub_gr.1_list  <- lapply( bh.gull_vp_4.5_NF_list, lapply, fun_bh.gull_vp_incub)
+
 ######### rearing chicks 1.05 - 10.06 #################################
+
+# narrow down the period to incubation and calculate mean
+fun_bh.gull_vp_rear <- function(x){
+  month <- as.integer(format(x$date2, '%m'))
+  day <- as.integer(format(x$date2, '%d'))
+  in_data1 <- filter(x, month == 5 & day >= 1 | month == 6 & day <= 10) #select incubation period
+  in_data2 <- aggregate(in_data1$flow, list(in_data1$subbasin), mean) #calculate mean for that period
+  setNames(in_data2, c("subbasin", "mean_rear")) #rename columns
+}
+
+bh.gull_nf_4.5_rear_gr.1_list  <- lapply( bh.gull_vp_4.5_NF_list, lapply, fun_bh.gull_vp_rear)
 
 ##############################################################################################
 ####### GROUP 2 ################################################################################
@@ -73,29 +113,33 @@ bh.gull_vp_4.5_NF <- lapply(input_files_4.5_NF, fun_bh.gull_vp)
 # Number of low pulses within each water year, Mean or median duration of low pulses (days),
 # Number of high pulses within each water year, Mean or median duration of high pulses (days)
 # above 0.95
-
+bh.gull_vp_4.5_NF <-
+data_4.5_NF <- 
 
 # calculate percentiles and quartiles
-RCH_split_q13_period <- lapply(data_4.5_NF,function(x) 
-  ddply(x,.(RCH), summarize,
+data_4.5_NF_q0.95_period <- lapply(data_4.5_NF, lapply, function(x) 
+  ddply(x,.(subbasin), summarize,
         P0.95=quantile(flow, 0.95)#find the 95% percentile for the period 2024-2050
-  ))
+        ))
 
-# reorganize list so it matches the structure of the other datasets        
-bh.gull_Q_mod_list_RCH <- bh.gull_Q_mod %>% group_split(bh.gull_Q_mod$RCH) %>% setNames(RCH_names)
+#count how many days during the vulnerability period are higher than 95% quartile 
+#
+nf_4.5_bh.gull.gr4 <-  Map(function(x,y)
+                                  aggregate(flow > P0.95, 
+                                        merge(x, y, all = TRUE, na.action = 'na.pass'), 
+                                        sum, na.rm = TRUE, na.action = 'na.pass'), 
+                          bh.gull_vp_4.5_NF, data_4.5_NF_q0.95_period)
 
-#count how many days during the vulnerability period are higher than 75% quartile and lower than 25%
-# I need to use the bh.gull_Q_mod_list_RCH
-bh.gull.gr4_part1 <- Map(function(x, y) aggregate(FLOW_OUTcms > cbind(Q3, P0.95)~Year, merge(x, y, all = TRUE,
-                                                                                             na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
-                         bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
+nf_4.5_bh.gull.gr4 <- purrr::lmap (bh.gull_vp_4.5_NF_list, data_4.5_NF_q0.95_period, .f=function(x, y)
+            {aggregate(flow > P0.95, 
+            merge(sublist(x), sublist(y), all = TRUE, na.action = 'na.pass'), 
+            sum, na.rm = TRUE, na.action = 'na.pass')})
 
-bh.gull.gr4_part2 <- Map(function(x, y) aggregate(FLOW_OUTcms < cbind(P0.05, Q1)~Year, merge(x, y, all = TRUE,
-                                                                                             na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass'), 
-                         bh.gull_Q_mod_list_RCH, RCH_split_q13_period)
+test<- lmap(.f=function(x, y){  aggregate(flow > P0.95, merge(x, y, all = TRUE,
+                  na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass')}, 
+    bh.gull_vp_4.5_NF_list, data_4.5_NF_q0.95_period)
 
-# cbind the two parts
-bh.gull_gr4_parts <- Map(cbind, bh.gull.gr4_part1, bh.gull.gr4_part2) 
+bh.gull_vp_4.5_NF_list[[2]]
 # remove Year appearing twice  
 bh.gull_list_gr.4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
 
