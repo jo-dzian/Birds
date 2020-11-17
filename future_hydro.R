@@ -127,13 +127,33 @@ fun_data_roll_list_max <- function(x) {
          day07_max=max(day07_mean) 
   )}
 
-data_4.5_NF_roll_list_max  <- lapply( data_4.5_NF_roll_list, lapply, fun_data_roll_list_max)
+bh.gull_nf_4.5_list_gr.2  <- lapply( data_4.5_NF_roll_list, lapply, fun_data_roll_list_max)
 
 ##############################################################################################
 ####### GROUP 3 ################################################################################
 ####### IHA group 3 is  Timing of annual extreme water conditions,
 #Julian date of each annual 1-day maximum 
 
+#bh.gull vp:
+#  11.04 is 101 or 102 (Leap) julian day
+#  10.06 is 161 or 162 (Leap) julian day
+# Leap years: 2004, 2008, 2012, 2016
+
+#add julian day
+fun_julian <- function(x) {
+  x$Year <- format(as.Date(x$date, format="%Y-%m-%d"),"%Y")
+  x$julian <- yday(x$date);return(x)}
+
+data_4.5_NF_julian  <- lapply( data_4.5_NF, lapply, fun_julian)
+
+fun_bh.gull_4.5_NF_list_gr.3 <- function(x) {
+  ddply(x,.(subbasin,Year), summarize,
+        max=max(flow),
+        julian_max= which.max(flow),#gives julian day of the min/max 
+        #chech if julian date is within vulnerability period range (101 and 162 days) and count as 1 if yes, 0 as no.
+        vp_max = case_when(julian_max >= 101 & julian_max <= 162 ~ 1, TRUE ~ 0))}
+
+bh.gull_nf_4.5_list_gr.3  <- lapply( data_4.5_NF_julian, lapply, fun_bh.gull_4.5_NF_list_gr.3)
 
 ##############################################################################################
 ####### GROUP 4 ################################################################################
