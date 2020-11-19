@@ -7,8 +7,18 @@ library(plyr)
 library(readr)
 
 subbasins_nr <- data.frame(rbind("910","950", "1012", "1087", "1134","1240","1264","1289", "1329","1358","1501", "1545",
-"1565","1601","1629", "1727","1746","1875"))
+"1565","1601","1629", "1727", "1748","1875"))
 colnames(subbasins_nr)<- c("RCH")
+
+#################################################################################################
+######### 4.5 NF ################################################################################
+######### 4.5 NF ################################################################################
+######### 4.5 NF ################################################################################
+######### 4.5 NF ################################################################################
+######### 4.5 NF ################################################################################
+######### 4.5 NF ################################################################################
+#################################################################################################
+
 
 #extract data for full year for subbasins of interest
 fun_sub_allyear <- function(x){
@@ -33,6 +43,8 @@ nf_2024_2050_4.5_cm9 <- fun_sub_allyear("D:/Ptaki_hydro/Obliczenia/4TU/future_cs
 data_4.5_NF <- list(nf_2024_2050_4.5_cm1, nf_2024_2050_4.5_cm2, nf_2024_2050_4.5_cm3,
                     nf_2024_2050_4.5_cm4, nf_2024_2050_4.5_cm5, nf_2024_2050_4.5_cm6,
                     nf_2024_2050_4.5_cm7, nf_2024_2050_4.5_cm8, nf_2024_2050_4.5_cm9)
+
+##!!!!!!! # I got subbasin 1746 mixed up with subbasin 1748, it should be the latter
 
 # extract data for vulnerability period for bh.gull for subbasins of interest
 
@@ -79,7 +91,26 @@ fun_bh.gull_vp_incub <- function(x){
   setNames(in_data2, c("subbasin", "mean_incub")) #rename columns
       }
 
+#result in a list of lists
 bh.gull_nf_4.5_incub_gr.1_list  <- lapply( bh.gull_vp_4.5_NF_list, lapply, fun_bh.gull_vp_incub)
+
+#obtain results for the reaches as a mean from 9 models
+bh.gull_nf_4.5_incub_gr.1_unlist <- bind_rows(list("mod.1" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[1]], .id = "id"), 
+                                                    "mod.2" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[2]], .id = "id"),
+                                                    "mod.3" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[3]], .id = "id"),
+                                                    "mod.4" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[4]], .id = "id"),
+                                                    "mod.5" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[5]], .id = "id"),
+                                                    "mod.6" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[6]], .id = "id"),
+                                                    "mod.7" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[7]], .id = "id"),
+                                                    "mod.8" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[8]], .id = "id"),
+                                                    "mod.9" = bind_rows(bh.gull_nf_4.5_incub_gr.1_list[[9]], .id = "id")), 
+                                               .id = "model") 
+
+bh.gull_nf_4.5_incub_gr.1_p1 <- aggregate(bh.gull_nf_4.5_incub_gr.1_unlist$mean_incub, 
+                          by=list(bh.gull_nf_4.5_incub_gr.1_unlist$subbasin), 
+                          FUN=mean)
+
+write.csv(bh.gull_nf_4.5_incub_gr.1_p1, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_nf_4.5_incub_gr.1.csv")
 
 ######### rearing chicks 1.05 - 10.06 #################################
 
@@ -93,6 +124,26 @@ fun_bh.gull_vp_rear <- function(x){
 }
 
 bh.gull_nf_4.5_rear_gr.1_list  <- lapply( bh.gull_vp_4.5_NF_list, lapply, fun_bh.gull_vp_rear)
+
+#obtain results for the reaches as a mean from 9 models
+bh.gull_nf_4.5_rear_gr.1_unlist <- bind_rows(list("mod.1" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[1]], .id = "id"), 
+                                                   "mod.2" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[2]], .id = "id"),
+                                                   "mod.3" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[3]], .id = "id"),
+                                                   "mod.4" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[4]], .id = "id"),
+                                                   "mod.5" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[5]], .id = "id"),
+                                                   "mod.6" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[6]], .id = "id"),
+                                                   "mod.7" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[7]], .id = "id"),
+                                                   "mod.8" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[8]], .id = "id"),
+                                                   "mod.9" = bind_rows(bh.gull_nf_4.5_rear_gr.1_list[[9]], .id = "id")), 
+                                              .id = "model") 
+
+bh.gull_nf_4.5_rear_gr.1_p1 <- aggregate(bh.gull_nf_4.5_rear_gr.1_unlist$mean_rear, 
+                                          by=list(bh.gull_nf_4.5_rear_gr.1_unlist$subbasin), 
+                                          FUN=mean)
+
+write.csv(bh.gull_nf_4.5_rear_gr.1_p1, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_nf_4.5_rear_gr.1.csv")
+
+
 
 ##############################################################################################
 ####### GROUP 2 ################################################################################
@@ -129,6 +180,31 @@ fun_data_roll_list_max <- function(x) {
 
 bh.gull_nf_4.5_list_gr.2  <- lapply( data_4.5_NF_roll_list, lapply, fun_data_roll_list_max)
 
+#obtain results for the reaches as a mean from 9 models
+bh.gull_nf_4.5_gr.2_unlist <- bind_rows(list("mod.1" = bind_rows(bh.gull_nf_4.5_list_gr.2[[1]], .id = "id"), 
+                                                  "mod.2" = bind_rows(bh.gull_nf_4.5_list_gr.2[[2]], .id = "id"),
+                                                  "mod.3" = bind_rows(bh.gull_nf_4.5_list_gr.2[[3]], .id = "id"),
+                                                  "mod.4" = bind_rows(bh.gull_nf_4.5_list_gr.2[[4]], .id = "id"),
+                                                  "mod.5" = bind_rows(bh.gull_nf_4.5_list_gr.2[[5]], .id = "id"),
+                                                  "mod.6" = bind_rows(bh.gull_nf_4.5_list_gr.2[[6]], .id = "id"),
+                                                  "mod.7" = bind_rows(bh.gull_nf_4.5_list_gr.2[[7]], .id = "id"),
+                                                  "mod.8" = bind_rows(bh.gull_nf_4.5_list_gr.2[[8]], .id = "id"),
+                                                  "mod.9" = bind_rows(bh.gull_nf_4.5_list_gr.2[[9]], .id = "id")), 
+                                             .id = "model") 
+
+bh.gull_nf_4.5_gr.2_unlist_p1 <- cbind(setNames(aggregate(bh.gull_nf_4.5_gr.2_unlist$day01_max, 
+                                                by=list(bh.gull_nf_4.5_gr.2_unlist$subbasin), 
+                                                FUN=mean), c("subbasin", "day01_mean")),
+                                       setNames(aggregate(bh.gull_nf_4.5_gr.2_unlist$day03_max, 
+                                                 by=list(bh.gull_nf_4.5_gr.2_unlist$subbasin), 
+                                                 FUN=mean), c("subbasin", "day03_mean")),
+                                       setNames(aggregate(bh.gull_nf_4.5_gr.2_unlist$day07_max, 
+                                                  by=list(bh.gull_nf_4.5_gr.2_unlist$subbasin), 
+                                                   FUN=mean), c("subbasin", "day07_mean")))
+
+write.csv(bh.gull_nf_4.5_gr.2_unlist_p1, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_nf_4.5_gr.2.csv")
+
+
 ##############################################################################################
 ####### GROUP 3 ################################################################################
 ####### IHA group 3 is  Timing of annual extreme water conditions,
@@ -156,6 +232,38 @@ fun_bh.gull_4.5_NF_list_gr.3 <- function(x) {
 
 bh.gull_nf_4.5_list_gr.3  <- lapply( data_4.5_NF_julian, lapply, fun_bh.gull_4.5_NF_list_gr.3)
 
+#obtain results for the reaches as a mean from 9 models
+bh.gull_nf_4.5_list_gr.3_unlist <- bind_rows(list("mod.1" = bind_rows(bh.gull_nf_4.5_list_gr.3[[1]], .id = "id"), 
+                                                  "mod.2" = bind_rows(bh.gull_nf_4.5_list_gr.3[[2]], .id = "id"),
+                                                  "mod.3" = bind_rows(bh.gull_nf_4.5_list_gr.3[[3]], .id = "id"),
+                                                  "mod.4" = bind_rows(bh.gull_nf_4.5_list_gr.3[[4]], .id = "id"),
+                                                  "mod.5" = bind_rows(bh.gull_nf_4.5_list_gr.3[[5]], .id = "id"),
+                                                  "mod.6" = bind_rows(bh.gull_nf_4.5_list_gr.3[[6]], .id = "id"),
+                                                  "mod.7" = bind_rows(bh.gull_nf_4.5_list_gr.3[[7]], .id = "id"),
+                                                  "mod.8" = bind_rows(bh.gull_nf_4.5_list_gr.3[[8]], .id = "id"),
+                                                  "mod.9" = bind_rows(bh.gull_nf_4.5_list_gr.3[[9]], .id = "id")), 
+                                             .id = "model") 
+
+#calculate sum of years (out of 27) where the peak flow occured during the vulnerability period (over_vp_max) 
+# in each model
+bh.gull_nf_4.5_list_gr.3_unlist_p1 <- setNames (aggregate(bh.gull_nf_4.5_list_gr.3_unlist$vp_max, 
+                                         by=list(bh.gull_nf_4.5_list_gr.3_unlist$model, 
+                                              bh.gull_nf_4.5_list_gr.3_unlist$subbasin), 
+                                         FUN=sum), c("model", "subbasin","above_vp_max"))
+
+# find a mean value from all 9 models
+bh.gull_nf_4.5_list_gr.3_unlist_p2 <- setNames (aggregate(bh.gull_nf_4.5_list_gr.3_unlist_p1$above_vp_max, 
+                                                          by=list(bh.gull_nf_4.5_list_gr.3_unlist_p1$subbasin), 
+                                                          FUN=mean), c("subbasin","mean_above_vp_max"))
+
+# per the 27 year period
+bh.gull_nf_4.5_list_gr.3_unlist_p2$mean_above_vp_max_period <- bh.gull_nf_4.5_list_gr.3_unlist_p2$mean_above_vp_max/27
+  
+  
+  
+write.csv(bh.gull_nf_4.5_list_gr.3_unlist_p2, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_nf_4.5_gr.3.csv")
+
+
 ##############################################################################################
 ####### GROUP 4 ################################################################################
 ####### IHA group 4 is  Frequency and duration of high and low pulses
@@ -178,11 +286,7 @@ fun_add_year <- function (x){
 bh.gull_vp_4.5_NF_list_y <- lapply(bh.gull_vp_4.5_NF_list, lapply, fun_add_year)
 
 
-#count how many days during the vulnerability period are higher than 95% quartile 
-#
-
-
-test <- bind_rows(list("mod.1" = bind_rows( bh.gull_vp_4.5_NF_list_y[[1]] , .id = "id"), 
+bh.gull_vp_4.5_NF_list_a <- bind_rows(list("mod.1" = bind_rows( bh.gull_vp_4.5_NF_list_y[[1]] , .id = "id"), 
                         "mod.2" = bind_rows( bh.gull_vp_4.5_NF_list_y[[2]], .id = "id"),
                         "mod.3" = bind_rows( bh.gull_vp_4.5_NF_list_y[[3]], .id = "id"),
                         "mod.4" = bind_rows( bh.gull_vp_4.5_NF_list_y[[4]], .id = "id"),
@@ -193,7 +297,7 @@ test <- bind_rows(list("mod.1" = bind_rows( bh.gull_vp_4.5_NF_list_y[[1]] , .id 
                         "mod.9" = bind_rows( bh.gull_vp_4.5_NF_list_y[[9]], .id = "id")),
                             .id = "model") 
 
-test2 <- bind_rows(list("mod.1" = bind_rows(data_4.5_NF_q0.95_period_in[[1]], .id = "id"), 
+data_4.5_NF_q0.95_period_list_a <- bind_rows(list("mod.1" = bind_rows(data_4.5_NF_q0.95_period_in[[1]], .id = "id"), 
                         "mod.2" = bind_rows(data_4.5_NF_q0.95_period_in[[2]], .id = "id"),
                         "mod.3" = bind_rows(data_4.5_NF_q0.95_period_in[[3]], .id = "id"),
                         "mod.4" = bind_rows(data_4.5_NF_q0.95_period_in[[4]], .id = "id"),
@@ -204,22 +308,57 @@ test2 <- bind_rows(list("mod.1" = bind_rows(data_4.5_NF_q0.95_period_in[[1]], .i
                         "mod.9" = bind_rows(data_4.5_NF_q0.95_period_in[[9]], .id = "id")), 
                         .id = "model") 
 
+#count how many days during the vulnerability period are higher than 95% quartile 
+#
+bh.gull_nf_4.5_gr.4_p1 <- full_join(bh.gull_vp_4.5_NF_list_a, data_4.5_NF_q0.95_period_list_a, 
+                   by=c("model","subbasin")) %>% 
+                    mutate(condition = (flow > P0.95))  
 
-test4 <- full_join(test, test2, by=c("model","subbasin")) %>% 
-          mutate(condition = (flow > P0.95))  
-
-test4$condition2 <- as.integer(test4$condition)
+bh.gull_nf_4.5_gr.4_p1$condition2 <- as.integer(bh.gull_nf_4.5_gr.4_p1$condition)
          
 
-test5 <- aggregate(test4$condition2, by=list(test4$model, test4$subbasin), FUN=sum)
+bh.gull_nf_4.5_gr.4_p2 <- aggregate(bh.gull_nf_4.5_gr.4_p1$condition2, 
+                   by=list(bh.gull_nf_4.5_gr.4_p1$model, bh.gull_nf_4.5_gr.4_p1$subbasin), FUN=sum)
 
 #mean number of days above Q3 per the 27 year period 2024-2050
-test5$yearly <- test5$x/27
+bh.gull_nf_4.5_gr.4_p2$yearly <- bh.gull_nf_4.5_gr.4_p2$x/27
 
-# 4.5 NF
+# calculate a mean out of all the 9 models per subbasin
+bh.gull_nf_4.5_gr.4_p3 <- aggregate(bh.gull_nf_4.5_gr.4_p2$yearly, 
+                                    by=list(bh.gull_nf_4.5_gr.4_p2$Group.2), FUN=mean)
 
-# 4.5 FF
+# write gr.4 to a file
+write.csv(bh.gull_nf_4.5_gr.4_p3, "D:/Ptaki_hydro/Obliczenia/R/Results/bh.gull_nf_4.5_gr.4.csv")
 
-# 8.5 NF
 
-# 8.5 FF
+#################################################################################################
+######### 4.5 FF ################################################################################
+######### 4.5 FF ################################################################################
+######### 4.5 FF ################################################################################
+######### 4.5 FF ################################################################################
+######### 4.5 FF ################################################################################
+######### 4.5 FF ################################################################################
+#################################################################################################
+
+
+
+#################################################################################################
+######### 8.5 NF ################################################################################
+######### 8.5 NF ################################################################################
+######### 8.5 NF ################################################################################
+######### 8.5 NF ################################################################################
+######### 8.5 NF ################################################################################
+######### 8.5 NF ################################################################################
+#################################################################################################
+
+
+
+
+#################################################################################################
+######### 8.5 FF ################################################################################
+######### 8.5 FF ################################################################################
+######### 8.5 FF ################################################################################
+######### 8.5 FF ################################################################################
+######### 8.5 FF ################################################################################
+######### 8.5 FF ################################################################################
+#################################################################################################
