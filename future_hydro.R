@@ -144,6 +144,7 @@ fun_julian <- function(x) {
   x$Year <- format(as.Date(x$date, format="%Y-%m-%d"),"%Y")
   x$julian <- yday(x$date);return(x)}
 
+gc()
 data_4.5_NF_julian  <- lapply( data_4.5_NF, lapply, fun_julian)
 
 fun_bh.gull_4.5_NF_list_gr.3 <- function(x) {
@@ -161,37 +162,59 @@ bh.gull_nf_4.5_list_gr.3  <- lapply( data_4.5_NF_julian, lapply, fun_bh.gull_4.5
 # Number of low pulses within each water year, Mean or median duration of low pulses (days),
 # Number of high pulses within each water year, Mean or median duration of high pulses (days)
 # above 0.95
-bh.gull_vp_4.5_NF <-
-data_4.5_NF <- 
 
+gc()
 # calculate percentiles and quartiles
-data_4.5_NF_q0.95_period <- lapply(data_4.5_NF, lapply, function(x) 
+fun_data_4.5_NF_q0.95_period <- function(x) {
   ddply(x,.(subbasin), summarize,
-        P0.95=quantile(flow, 0.95)#find the 95% percentile for the period 2024-2050
-        ))
+        P0.95=quantile(flow, 0.95))#find the 95% percentile for the period 2024-2050
+  }
+
+data_4.5_NF_q0.95_period_in <- lapply(data_4.5_NF_julian, lapply, fun_data_4.5_NF_q0.95_period)
+
+fun_add_year <- function (x){
+  x$Year <- format(as.Date(x$date, format="%Y-%m-%d"),"%Y");return(x)}
+
+bh.gull_vp_4.5_NF_list_y <- lapply(bh.gull_vp_4.5_NF_list, lapply, fun_add_year)
+
 
 #count how many days during the vulnerability period are higher than 95% quartile 
 #
-nf_4.5_bh.gull.gr4 <-  Map(function(x,y)
-                                  aggregate(flow > P0.95, 
-                                        merge(x, y, all = TRUE, na.action = 'na.pass'), 
-                                        sum, na.rm = TRUE, na.action = 'na.pass'), 
-                          bh.gull_vp_4.5_NF, data_4.5_NF_q0.95_period)
-
-nf_4.5_bh.gull.gr4 <- purrr::lmap (bh.gull_vp_4.5_NF_list, data_4.5_NF_q0.95_period, .f=function(x, y)
-            {aggregate(flow > P0.95, 
-            merge(sublist(x), sublist(y), all = TRUE, na.action = 'na.pass'), 
-            sum, na.rm = TRUE, na.action = 'na.pass')})
-
-test<- lmap(.f=function(x, y){  aggregate(flow > P0.95, merge(x, y, all = TRUE,
-                  na.action = 'na.pass'), sum, na.rm = TRUE, na.action = 'na.pass')}, 
-    bh.gull_vp_4.5_NF_list, data_4.5_NF_q0.95_period)
-
-bh.gull_vp_4.5_NF_list[[2]]
-# remove Year appearing twice  
-bh.gull_list_gr.4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
 
 
+test <- bind_rows(list("mod.1" = bind_rows( bh.gull_vp_4.5_NF_list_y[[1]] , .id = "id"), 
+                        "mod.2" = bind_rows( bh.gull_vp_4.5_NF_list_y[[2]], .id = "id"),
+                        "mod.3" = bind_rows( bh.gull_vp_4.5_NF_list_y[[3]], .id = "id"),
+                        "mod.4" = bind_rows( bh.gull_vp_4.5_NF_list_y[[4]], .id = "id"),
+                        "mod.5" = bind_rows( bh.gull_vp_4.5_NF_list_y[[5]], .id = "id"),
+                        "mod.6" = bind_rows( bh.gull_vp_4.5_NF_list_y[[6]], .id = "id"),
+                        "mod.7" = bind_rows( bh.gull_vp_4.5_NF_list_y[[7]], .id = "id"),
+                        "mod.8" = bind_rows( bh.gull_vp_4.5_NF_list_y[[8]], .id = "id"),
+                        "mod.9" = bind_rows( bh.gull_vp_4.5_NF_list_y[[9]], .id = "id")),
+                            .id = "model") 
+
+test2 <- bind_rows(list("mod.1" = bind_rows(data_4.5_NF_q0.95_period_in[[1]], .id = "id"), 
+                        "mod.2" = bind_rows(data_4.5_NF_q0.95_period_in[[2]], .id = "id"),
+                        "mod.3" = bind_rows(data_4.5_NF_q0.95_period_in[[3]], .id = "id"),
+                        "mod.4" = bind_rows(data_4.5_NF_q0.95_period_in[[4]], .id = "id"),
+                        "mod.5" = bind_rows(data_4.5_NF_q0.95_period_in[[5]], .id = "id"),
+                        "mod.6" = bind_rows(data_4.5_NF_q0.95_period_in[[6]], .id = "id"),
+                        "mod.7" = bind_rows(data_4.5_NF_q0.95_period_in[[7]], .id = "id"),
+                        "mod.8" = bind_rows(data_4.5_NF_q0.95_period_in[[8]], .id = "id"),
+                        "mod.9" = bind_rows(data_4.5_NF_q0.95_period_in[[9]], .id = "id")), 
+                        .id = "model") 
+
+
+test4 <- full_join(test, test2, by=c("model","subbasin")) %>% 
+          mutate(condition = (flow > P0.95))  
+
+test4$condition2 <- as.integer(test4$condition)
+         
+
+test5 <- aggregate(test4$condition2, by=list(test4$model, test4$subbasin), FUN=sum)
+
+#mean number of days above Q3 per the 27 year period 2024-2050
+test5$yearly <- test5$x/27
 
 # 4.5 NF
 
@@ -200,4 +223,3 @@ bh.gull_list_gr.4 <-  lapply(bh.gull_gr4_parts , "[", -c(4))
 # 8.5 NF
 
 # 8.5 FF
-
